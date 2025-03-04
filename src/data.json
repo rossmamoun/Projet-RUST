@@ -1,0 +1,78 @@
+[
+    {
+        "type": "Joueur",
+        "position": "Piece1"
+    },
+    {
+        "type": "lieu",
+        "id": "piece1",
+        "nom":"Marine Ford",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "piece2"
+            },
+            {
+                "orientation": "E",
+                "destination": "piece3"
+            },
+            {
+                "orientation": "S",
+                "destination": "piece4"
+            },
+            {
+                "orientation": "O",
+                "destination": "piece5"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece2",
+        "nom":"Alabasta",
+        "connections": [
+            
+            {
+                "orientation": "S",
+                "destination": "piece1"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece3",
+        "nom":"dressroza",
+        "connections": [
+            
+            {
+                "orientation": "O",
+                "destination": "piece1"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece4",
+        "nom":"skipia",
+        "connections": [
+            
+            {
+                "orientation": "N",
+                "destination": "piece1"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece5",
+        "nom":"Wano",
+        "connections": [
+            
+            {
+                "orientation": "E",
+                "destination": "piece1"
+            }
+        ]
+    }
+
+]

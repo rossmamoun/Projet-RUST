@@ -62,6 +62,53 @@ enum Objet {
     Lieu(Lieu)
 }
 
+fn show_objects_at_player_position(objets: &[Objet]) {
+    // Find the player and get their position
+    let mut player_position = None;
+    
+    for obj in objets {
+        if let Objet::Joueur(joueur) = obj {
+            player_position = Some(&joueur.position);
+            break;
+        }
+    }
+    
+    let player_position = match player_position {
+        Some(pos) => pos,
+        None => {
+            println!("Aucun joueur trouvé!");
+            return;
+        }
+    };
+    
+    println!("À la position {} vous trouvez:", player_position);
+    
+    // Find objects at player's position
+    let mut found_something = false;
+    
+    for obj in objets {
+        match obj {
+            Objet::ObjetStatique(o) if o.position == *player_position => {
+                println!("  • Objet Statique: {} ({})", o.nom, o.id);
+                found_something = true;
+            },
+            Objet::ObjetMobile(o) if o.position == *player_position => {
+                println!("  • Objet Mobile: {} ({})", o.nom, o.id);
+                found_something = true;
+            },
+            Objet::Pnj(p) if p.position == *player_position => {
+                println!("  • PNJ: {} - {}", p.nom, p.description);
+                found_something = true;
+            },
+            _ => {}
+        }
+    }
+    
+    if !found_something {
+        println!("  Rien d'autre ici.");
+    }
+}
+
 fn main() {
     // Lire le fichier JSON
     let data = fs::read_to_string("data.json").expect("Impossible de lire le fichier");
@@ -84,4 +131,5 @@ fn main() {
             Objet::ObjetMobile(o) => println!("Objet Mobile : {} ({})", o.nom, o.id),
         }
     }
+    show_objects_at_player_position(&objets);
 }

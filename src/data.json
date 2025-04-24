@@ -1,7 +1,28 @@
 [
     {
         "type": "Joueur",
-        "position": "Piece1"
+        "position": "piece1",
+        "inventaire": []
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "objet2",
+        "nom": "Table",
+        "description": "Une table en bois.",
+        "position": "piece1"
+    },
+    {
+        "type":"ObjetMobile",
+        "id":"objet1",
+        "nom":"Bateau",
+        "description":"Un bateau en bois.",
+        "position":"piece1"
+    },
+    {
+        "type": "Pnj",
+        "nom": "Luffy",
+        "description": "Je suis le capitaine des pirates du chapeau de paille.",
+        "position": "piece1"
     },
     {
         "type": "lieu",
@@ -25,6 +46,10 @@
                 "destination": "piece5"
             }
         ]
+        
+        
+           
+
     },
     {
         "type": "lieu",

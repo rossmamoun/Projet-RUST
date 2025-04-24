@@ -25,6 +25,14 @@
         "position": "Piece1"
     },
     {
+        "type": "Pnj",
+        "nom": "Crocodile",
+        "description": "Sashiburidana MUGIWARA.",
+        "position": "piece1",
+        "is_enemy": true,
+        "required_items": ["objet2"]
+    },
+    {
         "type": "lieu",
         "id": "piece1",
         "nom":"Marine Ford",

@@ -34,6 +34,10 @@ struct Pnj {
     nom: String,
     description: String,
     position: String,
+    #[serde(default)]
+    is_enemy: bool,
+    #[serde(default)]
+    required_items: Vec<String> // IDs des objets requis pour vaincre
 }
 
 #[derive(Debug, Deserialize)]
@@ -97,7 +101,7 @@ fn show_objects_at_player_position(objets: &[Objet]) {
                 found_something = true;
             },
             Objet::Pnj(p) if p.position == *player_position => {
-                println!("  • PNJ: {} - {}", p.nom, p.description);
+                println!("  • PNJ: {}", p.nom);
                 found_something = true;
             },
             _ => {}
@@ -107,6 +111,72 @@ fn show_objects_at_player_position(objets: &[Objet]) {
     if !found_something {
         println!("  Rien d'autre ici.");
     }
+}
+
+fn interact(objets: &[Objet], pnj_name: &str) {
+    // Trouver position et inventaire du joueur
+    let mut player_position = None;
+    let mut player_inventory = None;
+    
+    for obj in objets {
+        if let Objet::Joueur(joueur) = obj {
+            player_position = Some(&joueur.position);
+            player_inventory = Some(&joueur.inventaire);
+            break;
+        }
+    }
+    
+    let player_position = match player_position {
+        Some(pos) => pos,
+        None => {
+            println!("Aucun joueur trouvé!");
+            return;
+        }
+    };
+    
+    let player_inventory = match player_inventory {
+        Some(inv) => inv,
+        None => {
+            println!("Inventaire non trouvé!");
+            return;
+        }
+    };
+    
+    // Chercher le PNJ
+    for obj in objets {
+        if let Objet::Pnj(p) = obj {
+            if p.nom.to_lowercase() == pnj_name.to_lowercase() && p.position == *player_position {
+                if p.is_enemy {
+                    println!("🔥 COMBAT! Vous affrontez {} !", p.nom);
+                    
+                    // Vérifier les objets requis
+                    let mut has_all_items = true;
+                    let mut missing_items = Vec::new();
+                    
+                    for item_id in &p.required_items {
+                        if !player_inventory.iter().any(|i| &i.id == item_id) {
+                            has_all_items = false;
+                            missing_items.push(item_id);
+                        }
+                    }
+                    
+                    if has_all_items {
+                        println!("Victoire! Vous avez vaincu {} grâce à votre équipement!", p.nom);
+                        // Ici: code pour récompenser le joueur
+                    } else {
+                        println!("Défaite! Vous n'avez pas l'équipement nécessaire.");
+                    }
+                } else {
+                    // Interaction normale
+                    println!("Vous interagissez avec {} :", p.nom);
+                    println!("\"{}\"", p.description);
+                }
+                return;
+            }
+        }
+    }
+    
+    println!("Vous ne voyez pas {} ici.", pnj_name);
 }
 
 fn main() {
@@ -132,4 +202,6 @@ fn main() {
         }
     }
     show_objects_at_player_position(&objets);
+
+    interact(&objets, "Crocodile");
 }

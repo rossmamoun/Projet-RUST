@@ -1,28 +1,43 @@
 [
     {
         "type": "Joueur",
-        "position": "Piece1",
-        "inventaire": []
+        "position": "piece2",
+        "inventaire": [
+            {
+                "id": "objet2",
+                "nom": "Table",
+                "description": "Une table en bois.",
+                "position": "piece1"
+            }
+        ]
     },
     {
         "type": "ObjetStatique",
         "id": "objet2",
         "nom": "Table",
         "description": "Une table en bois.",
-        "position": "Piece1"
+        "position": "piece1"
     },
     {
         "type":"ObjetMobile",
         "id":"objet1",
         "nom":"Bateau",
         "description":"Un bateau en bois.",
-        "position":"Piece1"
+        "position":"piece1"
     },
     {
         "type": "Pnj",
         "nom": "Luffy",
         "description": "Je suis le capitaine des pirates du chapeau de paille.",
-        "position": "Piece1"
+        "position": "piece1"
+    },
+    {
+        "type": "Pnj",
+        "nom": "Crocodile",
+        "description": "Sashiburidana MUGIWARA.",
+        "position": "piece2",
+        "is_enemy": true,
+        "required_items": ["objet2"]
     },
     {
         "type": "lieu",

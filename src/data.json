@@ -1,8 +1,13 @@
 [
     {
         "type": "Joueur",
+        "nom": "",
+        "fruit_de_demon": null,
         "position": "piece1",
-        "inventaire": []
+        "inventaire": [],
+        "force": 99,
+        "agilite": 95,
+        "intelligence": 90
     },
     {
         "type": "ObjetStatique",
@@ -25,66 +30,54 @@
         "position": "piece1"
     },
     {
+        "type": "Pnj",
+        "nom": "Crocodile",
+        "description": "Sashiburidana MUGIWARA.",
+        "position": "piece1",
+        "is_enemy": true,
+        "required_items": ["objet2"]
+    },
+    {
+        "type": "Pnj",
+        "nom": "Doflamingo",
+        "description": "Le roi de Dressrosa.",
+        "position": "piece3",
+        "is_enemy": true
+    },
+    {
         "type": "lieu",
         "id": "piece1",
         "nom":"Marine Ford",
         "connections": [
-            {
-                "orientation": "N",
-                "destination": "piece2"
-            },
-            {
-                "orientation": "E",
-                "destination": "piece3"
-            },
-            {
-                "orientation": "S",
-                "destination": "piece4"
-            },
-            {
-                "orientation": "O",
-                "destination": "piece5"
-            }
+            { "orientation": "N", "destination": "piece2" },
+            { "orientation": "E", "destination": "piece3" },
+            { "orientation": "S", "destination": "piece4" },
+            { "orientation": "O", "destination": "piece5" }
         ]
-        
-        
-           
-
     },
     {
         "type": "lieu",
         "id": "piece2",
         "nom":"Alabasta",
         "connections": [
-            
-            {
-                "orientation": "S",
-                "destination": "piece1"
-            }
+            { "orientation": "S", "destination": "piece1" }
         ]
     },
     {
         "type": "lieu",
         "id": "piece3",
-        "nom":"dressroza",
+        "nom":"Dressroza",
         "connections": [
-            
-            {
-                "orientation": "O",
-                "destination": "piece1"
-            }
+            { "orientation": "O", "destination": "piece1" },
+            { "orientation": "E", "destination": "piece6" }
         ]
     },
     {
         "type": "lieu",
         "id": "piece4",
-        "nom":"skipia",
+        "nom":"Skipia",
         "connections": [
-            
-            {
-                "orientation": "N",
-                "destination": "piece1"
-            }
+            { "orientation": "N", "destination": "piece1" }
         ]
     },
     {
@@ -92,12 +85,63 @@
         "id": "piece5",
         "nom":"Wano",
         "connections": [
-            
+            { "orientation": "E", "destination": "piece1" }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece6",
+        "nom":"Laugh Tale",
+        "connections": [
+            { "orientation": "O", "destination": "piece3" },
+            { "orientation": "N", "destination": "piece7" }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece7",
+        "nom":"Whole Cake Island",
+        "connections": [
+            { "orientation": "S", "destination": "piece6" },
+            { "orientation": "E", "destination": "piece8" }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece8",
+        "nom":"Punk Hazard",
+        "connections": [
+            { "orientation": "O", "destination": "piece7" }
+        ]
+    },
+    {
+    "type": "FruitDuDemon",
+    "id": "mera",
+    "nom": "Mera Mera no Mi",
+    "description": "Permet de contrôler le feu.",
+    "pouvoir": "Feu",
+    "position": "piece2",
+    "attaque": [
+        {
+            "nom": "Hiken",
+            "description": "Poing de feu géant.",
+            "puissance": 80
+        }
+    ]
+    },
+    {
+        "type": "FruitDuDemon",
+        "id": "yami",
+        "nom": "Yami Yami no Mi",
+        "description": "Permet de contrôler les ténèbres.",
+        "pouvoir": "Ténèbres",
+        "position": "piece1",
+        "attaque": [
             {
-                "orientation": "E",
-                "destination": "piece1"
+                "nom": "Kurouzu",
+                "description": "Attire l'ennemi dans les ténèbres.",
+                "puissance": 90
             }
         ]
     }
-
 ]

@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::fs;
+use std::{fs, vec};
 use std::io::{self, Write};
 
 
@@ -32,6 +32,7 @@ struct Joueur {
     force: u32, // Force du joueur
     agilite: u32, // Agilité du joueur
     intelligence: u32, // Intelligence du joueur
+    fruit : Option<FruitDuDemon>, 
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -42,7 +43,8 @@ struct Pnj {
     #[serde(default)]
     is_enemy: bool,
     #[serde(default)]
-    required_items: Vec<String> // IDs des objets requis pour vaincre
+    required_items: Vec<String>, // IDs des objets requis pour vaincre
+    objet : ObjetStatique // Objet que le PNJ possède
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -50,6 +52,23 @@ struct Lieu {
     id: String,
     nom: String,
     connections: Vec<Connection>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+struct FruitDuDemon {
+    id: String,
+    nom: String,
+    description: String,
+    pouvoir: String,
+    position: String, // Position du fruit dans le monde
+    attaque: Vec<Attaque>, // Attaques possibles avec ce fruit
+}
+
+#[derive(Debug, Deserialize, Clone)]
+struct Attaque {
+    nom: String,
+    description: String,
+    puissance: u32, // Puissance de l'attaque
 }
 
 #[derive(Debug, Deserialize)]
@@ -68,7 +87,10 @@ enum Objet {
     Joueur(Joueur),
     
     #[serde(rename = "lieu")]
-    Lieu(Lieu)
+    Lieu(Lieu),
+
+    #[serde(rename = "FruitDuDemon")]
+    FruitDuDemon(FruitDuDemon)
 }
 
 fn show_objects_at_player_position(objets: &[Objet]) {
@@ -349,6 +371,7 @@ fn main() {
                 force: joueur.force,
                 agilite: joueur.agilite,
                 intelligence: joueur.intelligence,
+                fruit: joueur.fruit.clone(),
             }),
             Objet::Lieu(lieu) => lieux.push(Lieu {
                 id: lieu.id.clone(),

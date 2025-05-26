@@ -5,7 +5,13 @@
         "inventaire": [],
         "force": 99,
         "agilite": 95,
-        "intelligence": 90
+        "intelligence": 90,
+        "fruit": {
+            "id": "gomu",
+            "nom": "Gomu Gomu no Mi",
+            "description": "Permet d'étirer son corps comme du caoutchouc.",
+            "pouvoir": "Élasticité"
+        }
     },
     {
         "type": "ObjetStatique",
@@ -14,6 +20,7 @@
         "description": "Une table en bois.",
         "position": "piece1"
     },
+
     {
         "type":"ObjetMobile",
         "id":"objet1",
@@ -26,6 +33,7 @@
         "nom": "Luffy",
         "description": "Je suis le capitaine des pirates du chapeau de paille.",
         "position": "piece1"
+
     },
     {
         "type": "Pnj",

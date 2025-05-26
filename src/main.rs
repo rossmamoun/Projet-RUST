@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use std::fs;
+use std::io::{self, Write};
 
 #[derive(Debug, Deserialize, Clone)]
 struct Connection {
@@ -26,7 +27,10 @@ struct ObjetMobile {
 #[derive(Debug, Deserialize, Clone)]
 struct Joueur {
     position: String,
-    inventaire: Vec<ObjetStatique>
+    inventaire: Vec<ObjetStatique>,
+    force: u32, // Force du joueur
+    agilite: u32, // Agilité du joueur
+    intelligence: u32, // Intelligence du joueur
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -92,8 +96,8 @@ fn show_objects_at_player_position(objets: &[Objet]) {
     
     for obj in objets {
         match obj {
-            Objet::ObjetStatique(o) if o.position == *player_position => {
-                println!("  • Objet Statique: {} ({})", o.nom, o.id);
+            Objet::ObjetStatique(os) if os.position == *player_position => {
+                println!("  • Objet Statique: {} ({})", os.nom, os.id);
                 found_something = true;
             },
             Objet::ObjetMobile(o) if o.position == *player_position => {
@@ -148,6 +152,7 @@ fn interact(objets: &[Objet], pnj_name: &str) {
             if p.nom.to_lowercase() == pnj_name.to_lowercase() && p.position == *player_position {
                 if p.is_enemy {
                     println!("🔥 COMBAT! Vous affrontez {} !", p.nom);
+                    println!("{}: {}",p.nom, p.description);
                     
                     // Vérifier les objets requis
                     let mut has_all_items = true;
@@ -242,12 +247,96 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>) {
     }
 }
 
+fn afficher_carte(lieux: &[Lieu]) {
+    println!("\n========== CARTE DU MONDE ==========");
+    for lieu in lieux {
+        println!("🗺️  {} [{}]", lieu.nom, lieu.id);
+        if lieu.connections.is_empty() {
+            println!("   └─ Aucune connexion.");
+        } else {
+            for (i, conn) in lieu.connections.iter().enumerate() {
+                let symbole = if i == lieu.connections.len() - 1 { "└─" } else { "├─" };
+                println!("   {} {} → {}", symbole, conn.orientation, conn.destination);
+            }
+        }
+        println!("-------------------------------------");
+    }
+    println!("=====================================\n");
+}
+
+fn afficher_stats(joueur: &Joueur) {
+    println!("--- Statistiques du joueur ---");
+    println!("Force       : {}", joueur.force);
+    println!("Agilité     : {}", joueur.agilite);
+    println!("Intelligence: {}", joueur.intelligence);
+}
+
+fn mini_jeu_devinette() {
+    use rand::Rng;
+    let secret = rand::rng().random_range(1..=10);
+    println!("Je pense à un nombre entre 1 et 10. Devine !");
+    let mut essais = 0;
+    loop {
+        let mut guess = String::new();
+        io::stdin().read_line(&mut guess).unwrap();
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                println!("Entre un nombre !");
+                continue;
+            }
+        };
+        essais += 1;
+        if guess == secret {
+            println!("Bravo ! Trouvé en {} essais.", essais);
+            break;
+        } else if guess < secret {
+            println!("C'est plus grand !");
+        } else {
+            println!("C'est plus petit !");
+        }
+    }
+}
+
+fn mini_jeu_pile_ou_face() {
+    use rand::Rng;
+    println!("Pile ou face ? (pile/face)");
+    let mut choix = String::new();
+    io::stdin().read_line(&mut choix).unwrap();
+    let choix = choix.trim().to_lowercase();
+    let tirage = if rand::rng().random_bool(0.5) { "pile" } else { "face" };    println!("Résultat : {}", tirage);
+    if choix == tirage {
+        println!("Gagné !");
+    } else {
+        println!("Perdu !");
+    }
+}
+
+fn mini_jeu_calcul() {
+    use rand::Rng;
+    let a = rand::rng().random_range(1..=10);
+    let b = rand::rng().random_range(1..=10);
+    println!("Combien font {} + {} ?", a, b);
+    let mut reponse = String::new();
+    io::stdin().read_line(&mut reponse).unwrap();
+    let reponse: i32 = match reponse.trim().parse() {
+        Ok(num) => num,
+        Err(_) => {
+            println!("Ce n'est pas un nombre !");
+            return;
+        }
+    };
+    if reponse == a + b {
+        println!("Bonne réponse !");
+    } else {
+        println!("Faux ! La bonne réponse était {}.", a + b);
+    }
+}
 
 
 
 
 fn main() {
-
     let data = fs::read_to_string("data.json").expect("Impossible de lire le fichier");
     let mut objets: Vec<Objet> = serde_json::from_str(&data).expect("Erreur de parsing JSON");
 
@@ -255,11 +344,14 @@ fn main() {
     let mut lieux: Vec<Lieu> = Vec::new();
     let mut joueurs: Vec<Joueur> = Vec::new();
 
-    for obj in &objets {  // Use a reference here instead
+    for obj in &objets {
         match obj {
             Objet::Joueur(joueur) => joueurs.push(Joueur {
                 position: joueur.position.clone(),
                 inventaire: joueur.inventaire.clone(),
+                force: joueur.force,
+                agilite: joueur.agilite,
+                intelligence: joueur.intelligence,
             }),
             Objet::Lieu(lieu) => lieux.push(Lieu {
                 id: lieu.id.clone(),
@@ -270,54 +362,122 @@ fn main() {
         }
     }
 
-    
+    // Boucle de jeu interactive
+    loop {
+        println!("\n--- Menu du jeu ---");
+        println!("1. Se déplacer");
+        println!("2. Ramasser les objets");
+        println!("3. Parler/Combattre un PNJ");
+        println!("4. Voir l'inventaire");
+        println!("5. Voir la description du lieu");
+        println!("6. Afficher la carte du monde");
+        println!("7. Afficher les statistiques du joueur");
+        println!("8. Mini-jeux amusants");
+        println!("9. Quitter");
+        print!("Votre choix : ");
+        io::stdout().flush().unwrap();
 
-     // Affichage des joueurs
-     println!("Joueurs:");
-     for joueur in &joueurs {
-         println!(" Position: {}", joueur.position);
-     }
- 
-     // Affichage des lieux
-     println!("\nLieux:");
-     for lieu in &lieux {
-         println!("ID: {}, Nom: {}, Connexions:", lieu.id, lieu.nom);
-         for conn in &lieu.connections {
-             println!("  -> {} vers {}", conn.orientation, conn.destination);
-         }
-     }
+        let mut choix = String::new();
+        io::stdin().read_line(&mut choix).unwrap();
+        let choix = choix.trim();
 
-     interact(&objets, "Crocodile"); 
+        match choix {
+            "1" => {
+                // Déplacement
+                if let Some(joueur) = joueurs.get_mut(0) {
+                    println!("Dans quelle direction ? (N/S/E/O)");
+                    let mut dir = String::new();
+                    io::stdin().read_line(&mut dir).unwrap();
+                    let dir = dir.trim();
+                    move_joueur(joueur, dir, &lieux);
+                    // Mettre à jour la position du joueur dans objets
+                    for obj in &mut objets {
+                        if let Objet::Joueur(j) = obj {
+                            j.position = joueur.position.clone();
+                        }
+                    }
+                }
+            }
+            "2" => {
+                // Ramasser les objets
+                capture_objets_statiques(&mut objets);
+                // Mettre à jour l'inventaire du joueur dans joueurs
+                for obj in &objets {
+                    if let Objet::Joueur(j) = obj {
+                        if let Some(joueur) = joueurs.get_mut(0) {
+                            joueur.inventaire = j.inventaire.clone();
+                        }
+                    }
+                }
+            }
+            "3" => {
+                // Parler/Combattre un PNJ
+                println!("Nom du PNJ ?");
+                let mut nom = String::new();
+                io::stdin().read_line(&mut nom).unwrap();
+                let nom = nom.trim();
+                interact(&objets, nom);
+            }
+            "4" => {
+                // Inventaire
+                if let Some(joueur) = joueurs.get(0) {
+                    let noms_inventaire: Vec<&String> = joueur.inventaire.iter().map(|o| &o.nom).collect();
+                    println!("Inventaire : {:?}", noms_inventaire);
+                }
+            }
+            "5" => {
+                // Description du lieu
+                if let Some(joueur) = joueurs.get(0) {
+                    let pos = &joueur.position;
+                    if let Some(lieu) = lieux.iter().find(|l| &l.id == pos) {
+                        println!("Vous êtes à : {} - {}", lieu.nom, lieu.id);
+                        println!("{}", lieu.nom);
+                        println!("Connexions :");
+                        for conn in &lieu.connections {
+                            println!("  -> {} vers {}", conn.orientation, conn.destination);
+                        }
+                    }
+                }
+                show_objects_at_player_position(&objets);
+            }
+            "6" => {
+                // Afficher la carte du monde
+                afficher_carte(&lieux);
+            }
+            "7" => {
+                // Afficher les statistiques du joueur
+                if let Some(joueur) = joueurs.get(0) {
+                    afficher_stats(joueur);
+                }
+            }
+            "8" => {
+                loop {
+                    println!("\n--- Mini-jeux ---");
+                    println!("1. Devinette");
+                    println!("2. Pile ou face");
+                    println!("3. Calcul mental");
+                    println!("4. Retour au menu principal");
+                    print!("Votre choix : ");
+                    io::stdout().flush().unwrap();
 
-     capture_objets_statiques(&mut objets);
-    // Afficher uniquement le joueur et son inventaire après capture
-    for obj in &objets {
-        if let Objet::Joueur(j) = obj {
-            let noms_inventaire: Vec<&String> = j.inventaire.iter().map(|o| &o.nom).collect();
-            println!(
-                "Joueur à la position : {:?}, inventaire : {:?}",
-                j.position,
-                noms_inventaire
-            );
+                    let mut jeu_choix = String::new();
+                    io::stdin().read_line(&mut jeu_choix).unwrap();
+                    let jeu_choix = jeu_choix.trim();
+
+                    match jeu_choix {
+                        "1" => mini_jeu_devinette(),
+                        "2" => mini_jeu_pile_ou_face(),
+                        "3" => mini_jeu_calcul(),
+                        "4" => break,
+                        _ => println!("Choix invalide."),
+                    }
+                }
+            }
+            "9" => {
+                println!("Au revoir !");
+                break;
+            }
+            _ => println!("Choix invalide."),
         }
-        
     }
-     // TEST::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    if let Some(joueur) = joueurs.get_mut(0) {  // On prend le premier joueur
-
-        println!("Lieu actuel du joueur  {}", joueur.position);
-        move_joueur(joueur, "E", &lieux);  // Exemple de déplacement vers la direction "E"
-        println!("Lieu actuel du joueur  {}", joueur.position);
-        move_joueur(joueur, "P", &lieux);  // Exemple de déplacement vers la direction "E"
-        println!("Lieu actuel du joueur  {}", joueur.position);
-
-    }
-
-    show_objects_at_player_position(&objets);
-
-
-    
 }
-
-
-

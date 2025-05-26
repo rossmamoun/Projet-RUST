@@ -2,27 +2,30 @@
     {
         "type": "Joueur",
         "position": "piece1",
-        "inventaire": []
+        "inventaire": [],
+        "force": 99,
+        "agilite": 95,
+        "intelligence": 90
     },
     {
         "type": "ObjetStatique",
         "id": "objet2",
         "nom": "Table",
         "description": "Une table en bois.",
-        "position": "Piece1"
+        "position": "piece1"
     },
     {
         "type":"ObjetMobile",
         "id":"objet1",
         "nom":"Bateau",
         "description":"Un bateau en bois.",
-        "position":"Piece1"
+        "position":"piece1"
     },
     {
         "type": "Pnj",
         "nom": "Luffy",
         "description": "Je suis le capitaine des pirates du chapeau de paille.",
-        "position": "Piece1"
+        "position": "piece1"
     },
     {
         "type": "Pnj",

@@ -15,7 +15,8 @@
         "nom": "Eau",
         "description": "Eau potable.",
         "position": "null",
-        "sous_position":"null"
+        "sous_position":"null",
+        "is_key": false
     },
     {
         "type":"ObjetMobile",
@@ -23,7 +24,8 @@
         "nom":"Bateau",
         "description":"vogue Merry",
         "position":"piece1",
-        "sous_position":"SEALABASTA"
+        "sous_position":"SEALABASTA",
+        "is_key": false
     },
     {
         "type": "Pnj",
@@ -32,7 +34,10 @@
         "position": "piece1",
         "is_enemy": false,
         "sous_position": "SEALABASTA",
-        "inventaire": ["objet2"]
+        "inventaire": ["objet2"],
+        "hp": 0,
+        "puissance": 0,
+        "attaques": []
     },
     {
         "type": "Pnj",
@@ -45,7 +50,7 @@
         "inventaire": ["key1", "boniglife1"],
         "hp": 100,
         "puissance": 15,
-        "attaque": ["attaque2"]
+        "attaques": ["attaque2"]
     },
     {
         "type": "Attaque",
@@ -65,7 +70,8 @@
         "type": "lieu",
         "id": "piece1",
         "nom":"Alabasta",
-        "requiredKey": "??????",
+        "description":"Un royaume désertique.",
+        "required_key": "??????",
         "connections": [
             {
                 "orientation": "E",
@@ -81,7 +87,8 @@
         "type": "lieu",
         "id": "piece2",
         "nom":"Marine Ford",
-        "requiredKey": "??????",
+        "description":"QG de la Marine.",
+        "required_key": "??????",
         "connections": [
             {
                 "orientation": "O",
@@ -97,7 +104,8 @@
         "type": "lieu",
         "id": "piece4",
         "nom":"Dressroza",
-        "requiredKey": "??????",
+        "description":"Île des jouets.",
+        "required_key": "??????",
         "connections": [
             {
                 "orientation": "S",
@@ -113,7 +121,8 @@
         "type": "lieu",
         "id": "piece3",
         "nom":"Water 7",
-        "requiredKey": "??????",
+        "description":"Ville des charpentiers.",
+        "required_key": "??????",
         "connections": [
             {
                 "orientation": "S",
@@ -133,7 +142,8 @@
         "type": "lieu",
         "id": "piece5",
         "nom":"Wano",
-        "requiredKey": "??????",
+        "description":"Île isolée du monde.",
+        "required_key": "??????",
         "connections": [
             {
                 "orientation": "S",
@@ -148,14 +158,8 @@
     "description": "Permet de transformer le corps en caoutchouc.",
     "pouvoir": "Caoutchouc",
     "position": "piece1",
-    "sous_position": "NEALABASTA",
-    "attaque": [
-        {
-            "nom": "Hiken",
-            "description": "Poing de feu géant.",
-            "puissance": 80
-        }
-    ]
+    "sous_position": "SEALABASTA",
+    "attaque": ["attaque1"]
     },
     {
         "type": "FruitDuDemon",
@@ -164,12 +168,7 @@
         "description": "Permet de contrôler les ténèbres.",
         "pouvoir": "Ténèbres",
         "position": "piece1",
-        "attaque": [
-            {
-                "nom": "Kurouzu",
-                "description": "Attire l'ennemi dans les ténèbres.",
-                "puissance": 90
-            }
-        ]
+        "sous_position": "NOALABASTA",
+        "attaque": ["attaque1"]
     }
 ]

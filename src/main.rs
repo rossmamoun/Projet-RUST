@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::{fs, vec};
+use std::fs;
 use std::io::{self, Write};
 
 
@@ -15,6 +15,18 @@ struct ObjetStatique {
     nom: String,
     description: String,
     position: String,
+    sous_position:String,
+    is_key: bool, // Indique si c'est une clé pour un lieu
+}
+
+#[derive(Debug, Deserialize, Clone)]
+struct Aliment {
+    id: String,
+    nom: String,
+    description: String,
+    position: String,
+    sous_position:String,
+    hp: u32, // Points de vie restaurés
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -23,35 +35,15 @@ struct ObjetMobile {
     nom: String,
     description: String,
     position: String,
+    sous_position:String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
-struct Joueur {
-    position: String,
-    inventaire: Vec<ObjetStatique>,
-    force: u32, // Force du joueur
-    agilite: u32, // Agilité du joueur
-    intelligence: u32, // Intelligence du joueur
-    fruit : Option<FruitDuDemon>, 
-}
-
-#[derive(Debug, Deserialize, Clone)]
-struct Pnj {
-    nom: String,
-    description: String,
-    position: String,
-    #[serde(default)]
-    is_enemy: bool,
-    #[serde(default)]
-    required_items: Vec<String>, // IDs des objets requis pour vaincre
-    objet : ObjetStatique // Objet que le PNJ possède
-}
-
-#[derive(Debug, Deserialize, Clone)]
-struct Lieu {
+struct Attaque {
     id: String,
     nom: String,
-    connections: Vec<Connection>,
+    description: String,
+    puissance: u32,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -59,16 +51,56 @@ struct FruitDuDemon {
     id: String,
     nom: String,
     description: String,
+    sous_position:String,
     pouvoir: String,
-    position: String, // Position du fruit dans le monde
-    attaque: Vec<Attaque>, // Attaques possibles avec ce fruit
+    position: String, 
+    attaque: Vec<String>,
+}
+
+
+#[derive(Debug, Deserialize, Clone)]
+struct Joueur {
+    nom: String,
+    fruit_de_demon: Option<FruitDuDemon>,
+    position: String,
+    sous_position:String,
+    inventaire: Vec<ObjetStatique>,
+    puissance: u32,
+    hp: u32
 }
 
 #[derive(Debug, Deserialize, Clone)]
-struct Attaque {
+struct Pnj {
     nom: String,
     description: String,
-    puissance: u32, // Puissance de l'attaque
+    position: String,
+    sous_position:String,
+    #[serde(default)]
+    is_enemy: bool,
+    #[serde(default)]
+    required_items: Vec<String>, // IDs des objets requis pour vaincre
+    inventaire: Vec<String>,
+    puissance: u32, 
+    hp: u32, 
+    attaques: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+struct Lieu {
+    id: String,
+    nom: String,
+    description: String,
+    connections: Vec<Connection>,
+    required_key: String, // Clé requise pour accéder à ce lieu
+}
+
+#[derive(Debug, Deserialize, Clone)]
+struct SousLieu {
+    id: String,
+    nom: String,
+    position: String,
+    description: String,
+    connections: Vec<Connection>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -85,12 +117,21 @@ enum Objet {
     
     #[serde(rename = "Joueur")]
     Joueur(Joueur),
+
+    #[serde(rename = "FruitDuDemon")]
+    FruitDuDemon(FruitDuDemon),
+    
+    #[serde(rename = "aliment")]
+    Aliment(Aliment),
+    
+    #[serde(rename = "souslieu")]
+    SousLieu(SousLieu),
     
     #[serde(rename = "lieu")]
     Lieu(Lieu),
 
-    #[serde(rename = "FruitDuDemon")]
-    FruitDuDemon(FruitDuDemon)
+    #[serde(rename = "Attaque")]
+    Attaque(Attaque),
 }
 
 fn show_objects_at_player_position(objets: &[Objet]) {
@@ -119,8 +160,8 @@ fn show_objects_at_player_position(objets: &[Objet]) {
     
     for obj in objets {
         match obj {
-            Objet::ObjetStatique(o) if o.position == *player_position => {
-                println!("  • Objet Statique: {} ({})", o.nom, o.id);
+            Objet::ObjetStatique(os) if os.position == *player_position => {
+                println!("  • Objet Statique: {} ({})", os.nom, os.id);
                 found_something = true;
             },
             Objet::ObjetMobile(o) if o.position == *player_position => {
@@ -140,15 +181,15 @@ fn show_objects_at_player_position(objets: &[Objet]) {
     }
 }
 
-fn interact(objets: &[Objet], pnj_name: &str) {
-    // Trouver position et inventaire du joueur
+fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) {
+    // Trouver position du joueur et son index
     let mut player_position = None;
-    let mut player_inventory = None;
+    let mut player_index = None;
     
-    for obj in objets {
+    for (i, obj) in objets.iter().enumerate() {
         if let Objet::Joueur(joueur) = obj {
-            player_position = Some(&joueur.position);
-            player_inventory = Some(&joueur.inventaire);
+            player_position = Some(joueur.position.clone());
+            player_index = Some(i);
             break;
         }
     }
@@ -161,47 +202,111 @@ fn interact(objets: &[Objet], pnj_name: &str) {
         }
     };
     
-    let player_inventory = match player_inventory {
-        Some(inv) => inv,
+    let player_index = match player_index {
+        Some(idx) => idx,
         None => {
-            println!("Inventaire non trouvé!");
+            println!("Index du joueur non trouvé!");
             return;
         }
     };
     
-    // Chercher le PNJ
-    for obj in objets {
+    // Chercher le PNJ et son index
+    for (i, obj) in objets.iter().enumerate() {
         if let Objet::Pnj(p) = obj {
-            if p.nom.to_lowercase() == pnj_name.to_lowercase() && p.position == *player_position {
+            if p.nom.to_lowercase() == pnj_name.to_lowercase() && p.position == player_position {
                 if p.is_enemy {
+                    // Logique de combat existante
                     println!("🔥 COMBAT! Vous affrontez {} !", p.nom);
+                    println!("{}: {}", p.nom, p.description);
                     
                     // Vérifier les objets requis
-                    let mut has_all_items = true;
-                    let mut missing_items = Vec::new();
-                    
-                    for item_id in &p.required_items {
-                        if !player_inventory.iter().any(|i| &i.id == item_id) {
-                            has_all_items = false;
-                            missing_items.push(item_id);
+                    if let Some(Objet::Joueur(joueur)) = objets.get(player_index) {
+                        let mut has_all_items = true;
+                        
+                        for item_id in &p.required_items {
+                            if !joueur.inventaire.iter().any(|i| &i.id == item_id) {
+                                has_all_items = false;
+                                break;
+                            }
+                        }
+                        
+                        if has_all_items {
+                            println!("Victoire! Vous avez vaincu {} grâce à votre équipement!", p.nom);
+                        } else {
+                            println!("Défaite! Vous n'avez pas l'équipement nécessaire.");
                         }
                     }
-                    
-                    if has_all_items {
-                        println!("Victoire! Vous avez vaincu {} grâce à votre équipement!", p.nom);
-                        // Ici: code pour récompenser le joueur
-                    } else {
-                        println!("Défaite! Vous n'avez pas l'équipement nécessaire.");
-                    }
                 } else {
-                    // Interaction normale
+                    // Interaction amicale
                     println!("Vous interagissez avec {} :", p.nom);
                     println!("\"{}\"", p.description);
+                    
+                    // Vérifier si le PNJ a des objets dans son inventaire
+                    if let Objet::Pnj(pnj) = &objets[i] {
+                        if !pnj.inventaire.is_empty() {
+                            // Récupérer l'ID de l'objet
+                            let objet_id = &pnj.inventaire[0];
+                            
+                            // Trouver l'objet correspondant à cet ID
+                            let mut objet_trouve = None;
+                            for obj in objets.iter() {
+                                if let Objet::ObjetStatique(o) = obj {
+                                    if o.id == *objet_id {
+                                        objet_trouve = Some(o.clone());
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if let Some(objet) = objet_trouve {
+                                println!("\n{} vous propose un objet : {}", p.nom, objet.nom);
+                                println!("Description : {}", objet.description);
+                                println!("\nVoulez-vous le prendre? (o/n)");
+                                
+                                let mut reponse = String::new();
+                                io::stdin().read_line(&mut reponse).expect("Erreur de lecture");
+                                let reponse = reponse.trim().to_lowercase();
+                                
+                                if reponse == "o" || reponse == "oui" {
+                                    // Supprimer l'ID de l'inventaire du PNJ
+                                    if let Some(Objet::Pnj(pnj)) = objets.get_mut(i) {
+                                        if !pnj.inventaire.is_empty() {
+                                            pnj.inventaire.remove(0);
+                                        }
+                                        
+                                        // Ajouter l'objet à l'inventaire du joueur
+                                        if let Some(Objet::Joueur(joueur)) = objets.get_mut(player_index) {
+                                            // Modifier l'objet pour qu'il soit dans l'inventaire
+                                            let mut objet_final = objet.clone();
+                                            objet_final.position = "inventaire".to_string();
+                                            
+                                            println!("→ Objet '{}' ajouté à votre inventaire !", objet_final.nom);
+                                            joueur.inventaire.push(objet_final);
+                                        }
+                                    }
+                                } else {
+                                    println!("Vous avez refusé l'objet.");
+                                }
+                            } else {
+                                println!("{} a un objet, mais impossible de le trouver dans le monde.", p.nom);
+                            }
+                        } else {
+                            println!("{} n'a rien à vous offrir.", p.nom);
+                        }
+                    }
                 }
+                    for obj in objets {
+                        if let Objet::Joueur(j) = obj {
+                            if let Some(joueur) = joueurs.get_mut(0) {
+                                joueur.inventaire = j.inventaire.clone();
+            }
+        }
+    }
                 return;
             }
         }
     }
+
     
     println!("Vous ne voyez pas {} ici.", pnj_name);
 }
@@ -229,7 +334,7 @@ fn move_joueur(joueur: &mut Joueur, direction: &str, lieux: &Vec<Lieu>) {
     println!("Le joueur ne se trouve dans aucun lieu valide.");
 }
 
-fn capture_objets_statiques(objets: &mut Vec<Objet>) {
+fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) {
     let mut player_index = None;
     let mut objets_a_ajouter = vec![];
 
@@ -267,31 +372,60 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>) {
     if let Objet::Joueur(joueur) = &mut objets[player_index] {
         joueur.inventaire.extend(objets_a_ajouter);
     }
-}
 
-fn afficher_carte(lieux: &[Lieu]) {
-    println!("\n========== CARTE DU MONDE ==========");
-    for lieu in lieux {
-        println!("🗺️  {} [{}]", lieu.nom, lieu.id);
-        if lieu.connections.is_empty() {
-            println!("   └─ Aucune connexion.");
-        } else {
-            for (i, conn) in lieu.connections.iter().enumerate() {
-                let symbole = if i == lieu.connections.len() - 1 { "└─" } else { "├─" };
-                println!("   {} {} → {}", symbole, conn.orientation, conn.destination);
+    // Add synchronization at the end
+    for obj in objets {
+        if let Objet::Joueur(j) = obj {
+            if let Some(joueur) = joueurs.get_mut(0) {
+                joueur.inventaire = j.inventaire.clone();
             }
         }
-        println!("-------------------------------------");
     }
-    println!("=====================================\n");
 }
 
-fn afficher_stats(joueur: &Joueur) {
-    println!("--- Statistiques du joueur ---");
-    println!("Force       : {}", joueur.force);
-    println!("Agilité     : {}", joueur.agilite);
-    println!("Intelligence: {}", joueur.intelligence);
+fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
+    if let Some(joueur) = joueurs.get_mut(0) {
+        if joueur.hp >= 100 {
+            println!("🛑 Vous avez déjà tous vos HP (100). Impossible de consommer un aliment !");
+            return;
+        }
+        // Liste des aliments reconnus
+        let aliments = ["pomme", "viande", "poisson", "boule de riz"];
+        if let Some((index, aliment)) = joueur.inventaire.iter().enumerate().find(|(_, obj)| {
+            let nom = obj.nom.to_lowercase();
+            aliments.iter().any(|a| nom.contains(a))
+        }) {
+            let gain_hp = if aliment.nom.to_lowercase().contains("pomme") {
+                20
+            } else if aliment.nom.to_lowercase().contains("viande") {
+                30
+            } else if aliment.nom.to_lowercase().contains("poisson") {
+                25
+            } else if aliment.nom.to_lowercase().contains("boule de riz") {
+                15
+            } else {
+                10
+            };
+            let hp_avant = joueur.hp;
+            joueur.hp = (joueur.hp + gain_hp).min(100);
+            let hp_gagne = joueur.hp - hp_avant;
+            println!("🍽️ Vous consommez : {}", aliment.nom);
+            println!("❤️  Vous regagnez {} HP ! HP actuel : {}", hp_gagne, joueur.hp);
+            joueur.inventaire.remove(index);
+
+            // Synchronisation avec la liste globale d'objets
+            for obj in objets.iter_mut() {
+                if let Objet::Joueur(j) = obj {
+                    j.inventaire = joueur.inventaire.clone();
+                    j.hp = joueur.hp;
+                }
+            }
+        } else {
+            println!("Vous n'avez pas d'aliment à consommer !");
+        }
+    }
 }
+
 
 fn mini_jeu_devinette() {
     use rand::Rng;
@@ -355,6 +489,9 @@ fn mini_jeu_calcul() {
     }
 }
 
+
+
+
 fn main() {
     let data = fs::read_to_string("data.json").expect("Impossible de lire le fichier");
     let mut objets: Vec<Objet> = serde_json::from_str(&data).expect("Erreur de parsing JSON");
@@ -366,17 +503,20 @@ fn main() {
     for obj in &objets {
         match obj {
             Objet::Joueur(joueur) => joueurs.push(Joueur {
+                nom: joueur.nom.clone(),
+                fruit_de_demon: joueur.fruit_de_demon.clone(),
                 position: joueur.position.clone(),
+                sous_position: joueur.sous_position.clone(),
                 inventaire: joueur.inventaire.clone(),
-                force: joueur.force,
-                agilite: joueur.agilite,
-                intelligence: joueur.intelligence,
-                fruit: joueur.fruit.clone(),
+                puissance: joueur.puissance,
+                hp: joueur.hp
             }),
             Objet::Lieu(lieu) => lieux.push(Lieu {
                 id: lieu.id.clone(),
                 nom: lieu.nom.clone(),
+                description: lieu.description.clone(),
                 connections: lieu.connections.clone(),
+                required_key: lieu.required_key.clone()
             }),
             _ => {}
         }
@@ -392,8 +532,9 @@ fn main() {
         println!("5. Voir la description du lieu");
         println!("6. Afficher la carte du monde");
         println!("7. Afficher les statistiques du joueur");
-        println!("8. Mini-jeux amusants");
-        println!("9. Quitter");
+        print!("8. Mini-jeux amusants\n");
+        println!("9. Consommer un aliment");
+        println!("Q. Quitter");
         print!("Votre choix : ");
         io::stdout().flush().unwrap();
 
@@ -420,15 +561,8 @@ fn main() {
             }
             "2" => {
                 // Ramasser les objets
-                capture_objets_statiques(&mut objets);
+                capture_objets_statiques(&mut objets, &mut joueurs);
                 // Mettre à jour l'inventaire du joueur dans joueurs
-                for obj in &objets {
-                    if let Objet::Joueur(j) = obj {
-                        if let Some(joueur) = joueurs.get_mut(0) {
-                            joueur.inventaire = j.inventaire.clone();
-                        }
-                    }
-                }
             }
             "3" => {
                 // Parler/Combattre un PNJ
@@ -436,7 +570,7 @@ fn main() {
                 let mut nom = String::new();
                 io::stdin().read_line(&mut nom).unwrap();
                 let nom = nom.trim();
-                interact(&objets, nom);
+                interact(&mut objets, nom, &mut joueurs);  // Maintenant avec &mut
             }
             "4" => {
                 // Inventaire
@@ -459,16 +593,6 @@ fn main() {
                     }
                 }
                 show_objects_at_player_position(&objets);
-            }
-            "6" => {
-                // Afficher la carte du monde
-                afficher_carte(&lieux);
-            }
-            "7" => {
-                // Afficher les statistiques du joueur
-                if let Some(joueur) = joueurs.get(0) {
-                    afficher_stats(joueur);
-                }
             }
             "8" => {
                 loop {
@@ -494,6 +618,9 @@ fn main() {
                 }
             }
             "9" => {
+                consommer_aliment(&mut joueurs, &mut objets);
+            }
+            "Q" => {
                 println!("Au revoir !");
                 break;
             }
@@ -501,6 +628,3 @@ fn main() {
         }
     }
 }
-
-
-

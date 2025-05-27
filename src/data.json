@@ -4,123 +4,151 @@
         "nom": "",
         "fruit_de_demon": null,
         "position": "piece1",
+        "sous_position":"SEALABASTA",
         "inventaire": [],
-        "force": 99,
-        "agilite": 95,
-        "intelligence": 90
+        "puissance": 100,
+        "hp": 100
     },
     {
         "type": "ObjetStatique",
         "id": "objet2",
-        "nom": "Table",
-        "description": "Une table en bois.",
-        "position": "piece1"
+        "nom": "Eau",
+        "description": "Eau potable.",
+        "position": "null",
+        "sous_position":"null"
     },
     {
         "type":"ObjetMobile",
         "id":"objet1",
         "nom":"Bateau",
-        "description":"Un bateau en bois.",
-        "position":"piece1"
+        "description":"vogue Merry",
+        "position":"piece1",
+        "sous_position":"SEALABASTA"
     },
     {
         "type": "Pnj",
-        "nom": "Luffy",
-        "description": "Je suis le capitaine des pirates du chapeau de paille.",
-        "position": "piece1"
+        "nom": "Vivi",
+        "description": "Princesse d'Alabasta.",
+        "position": "piece1",
+        "is_enemy": false,
+        "sous_position": "SEALABASTA",
+        "inventaire": ["objet2"]
     },
     {
         "type": "Pnj",
         "nom": "Crocodile",
         "description": "Sashiburidana MUGIWARA.",
         "position": "piece1",
+        "sous_position": "NOALABASTA",
         "is_enemy": true,
-        "required_items": ["objet2"]
+        "required_items": ["objet2"],
+        "inventaire": ["key1", "boniglife1"],
+        "hp": 100,
+        "puissance": 15,
+        "attaque": ["attaque2"]
     },
     {
-        "type": "Pnj",
-        "nom": "Doflamingo",
-        "description": "Le roi de Dressrosa.",
-        "position": "piece3",
-        "is_enemy": true
+        "type": "Attaque",
+        "id": "attaque1",
+        "nom": "Gomu Gomu no Pistol",
+        "description": "Attaque de base de Luffy.",
+        "puissance": 40
+    },
+    {
+        "type": "Attaque",
+        "id": "attaque2",
+        "nom": "Attaque de Crocodile",
+        "description": "Attaque de base de Crocodile.",
+        "puissance": 70
     },
     {
         "type": "lieu",
         "id": "piece1",
-        "nom":"Marine Ford",
+        "nom":"Alabasta",
+        "requiredKey": "??????",
         "connections": [
-            { "orientation": "N", "destination": "piece2" },
-            { "orientation": "E", "destination": "piece3" },
-            { "orientation": "S", "destination": "piece4" },
-            { "orientation": "O", "destination": "piece5" }
+            {
+                "orientation": "E",
+                "destination": "piece2"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece3"
+            }
         ]
     },
     {
         "type": "lieu",
         "id": "piece2",
-        "nom":"Alabasta",
+        "nom":"Marine Ford",
+        "requiredKey": "??????",
         "connections": [
-            { "orientation": "S", "destination": "piece1" }
-        ]
-    },
-    {
-        "type": "lieu",
-        "id": "piece3",
-        "nom":"Dressroza",
-        "connections": [
-            { "orientation": "O", "destination": "piece1" },
-            { "orientation": "E", "destination": "piece6" }
+            {
+                "orientation": "O",
+                "destination": "piece1"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece4"
+            }
         ]
     },
     {
         "type": "lieu",
         "id": "piece4",
-        "nom":"Skipia",
+        "nom":"Dressroza",
+        "requiredKey": "??????",
         "connections": [
-            { "orientation": "N", "destination": "piece1" }
+            {
+                "orientation": "S",
+                "destination": "piece2"
+            },
+            {
+                "orientation": "O",
+                "destination": "piece3"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece3",
+        "nom":"Water 7",
+        "requiredKey": "??????",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "piece1"
+            },
+            {
+                "orientation": "E",
+                "destination": "piece4"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece5"
+            }
         ]
     },
     {
         "type": "lieu",
         "id": "piece5",
         "nom":"Wano",
+        "requiredKey": "??????",
         "connections": [
-            { "orientation": "E", "destination": "piece1" }
-        ]
-    },
-    {
-        "type": "lieu",
-        "id": "piece6",
-        "nom":"Laugh Tale",
-        "connections": [
-            { "orientation": "O", "destination": "piece3" },
-            { "orientation": "N", "destination": "piece7" }
-        ]
-    },
-    {
-        "type": "lieu",
-        "id": "piece7",
-        "nom":"Whole Cake Island",
-        "connections": [
-            { "orientation": "S", "destination": "piece6" },
-            { "orientation": "E", "destination": "piece8" }
-        ]
-    },
-    {
-        "type": "lieu",
-        "id": "piece8",
-        "nom":"Punk Hazard",
-        "connections": [
-            { "orientation": "O", "destination": "piece7" }
+            {
+                "orientation": "S",
+                "destination": "piece3"
+            }
         ]
     },
     {
     "type": "FruitDuDemon",
-    "id": "mera",
-    "nom": "Mera Mera no Mi",
-    "description": "Permet de contrôler le feu.",
-    "pouvoir": "Feu",
-    "position": "piece2",
+    "id": "gomu",
+    "nom": "Gomu Gomu no Mi",
+    "description": "Permet de transformer le corps en caoutchouc.",
+    "pouvoir": "Caoutchouc",
+    "position": "piece1",
+    "sous_position": "NEALABASTA",
     "attaque": [
         {
             "nom": "Hiken",

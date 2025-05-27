@@ -15,6 +15,17 @@ struct ObjetStatique {
     nom: String,
     description: String,
     position: String,
+    sous_position:String,
+    is_key: bool, // Indique si c'est une clé pour un lieu
+}
+
+struct Aliment {
+    id: String,
+    nom: String,
+    description: String,
+    position: String,
+    sous_position:String,
+    hp: u32, // Points de vie restaurés
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -23,10 +34,12 @@ struct ObjetMobile {
     nom: String,
     description: String,
     position: String,
+    sous_position:String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 struct Attaque {
+    id: String,
     nom: String,
     description: String,
     puissance: u32,
@@ -37,8 +50,9 @@ struct FruitDuDemon {
     id: String,
     nom: String,
     description: String,
+    sous_position:String,
     pouvoir: String,
-    position: String, // ex: "piece3"
+    position: String, 
     attaque: Vec<Attaque>,
 }
 
@@ -48,10 +62,10 @@ struct Joueur {
     nom: String,
     fruit_de_demon: Option<FruitDuDemon>,
     position: String,
+    sous_position:String,
     inventaire: Vec<ObjetStatique>,
-    force: u32, // Force du joueur
-    agilite: u32, // Agilité du joueur
-    intelligence: u32, // Intelligence du joueur
+    puissance: u32,
+    hp: u32
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -59,16 +73,33 @@ struct Pnj {
     nom: String,
     description: String,
     position: String,
+    sous_position:String,
     #[serde(default)]
     is_enemy: bool,
     #[serde(default)]
-    required_items: Vec<String> // IDs des objets requis pour vaincre
+    required_items: Vec<String>, // IDs des objets requis pour vaincre
+    inventaire: Vec<String>,
+    puissance: u32, 
+    hp: u32, 
+    attaques: Vec<String>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 struct Lieu {
     id: String,
     nom: String,
+    position: String,
+    description: String,
+    connections: Vec<Connection>,
+    required_key: String, // Clé requise pour accéder à ce lieu
+}
+
+#[derive(Debug, Deserialize, Clone)]
+struct SousLieu {
+    id: String,
+    nom: String,
+    position: String,
+    description: String,
     connections: Vec<Connection>,
 }
 
@@ -89,6 +120,12 @@ enum Objet {
 
     #[serde(rename = "FruitDuDemon")]
     FruitDuDemon(FruitDuDemon),
+    
+    #[serde(rename = "aliment")]
+    Aliment(Aliment),
+    
+    #[serde(rename = "souslieu")]
+    SousLieu(SousLieu),
     
     #[serde(rename = "lieu")]
     Lieu(Lieu)

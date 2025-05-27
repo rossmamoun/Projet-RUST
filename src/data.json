@@ -32,7 +32,6 @@
         "nom": "Vivi",
         "description": "Princesse d'Alabasta.",
         "position": "piece1",
-        "is_enemy": false,
         "sous_position": "SEALABASTA",
         "inventaire": ["objet2"],
         "hp": 0,
@@ -51,6 +50,18 @@
         "hp": 100,
         "puissance": 15,
         "attaques": ["attaque2"]
+    },
+    {
+        "type": "Pnj",
+        "nom": "Raily",
+        "description": "Charpentier de l'équipage.",
+        "position": "piece1",
+        "sous_position": "SEALABASTA",
+        "required_items": [],
+        "inventaire": [],
+        "hp": 100,
+        "puissance": 200,
+        "is_entraineur": true
     },
     {
         "type": "Attaque",

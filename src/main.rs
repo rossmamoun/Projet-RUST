@@ -82,7 +82,10 @@ struct Pnj {
     inventaire: Vec<String>,
     puissance: u32, 
     hp: u32, 
+    #[serde(default)]
     attaques: Vec<String>,
+    #[serde(default)]
+    is_entraineur: bool, // Indique si c'est un PNJ entraîneur
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -429,6 +432,62 @@ fn capture_fruit_de_demon(objets: &mut Vec<Objet>, joueur: &mut Joueur) {
     }
 }
 
+fn entrainement(objets: &mut [Objet], joueur: &mut Joueur) {
+    // Chercher le premier PNJ entraîneur dans la même sous_position
+    let entraineur = objets.iter().find_map(|obj| {
+        if let Objet::Pnj(pnj) = obj {
+            if pnj.sous_position == joueur.sous_position && pnj.is_entraineur {
+                Some(pnj)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    });
+
+    if let Some(pnj) = entraineur {
+        println!("{} : \"Salut {} ! Prêt pour un nouvel entraînement ? Aujourd'hui, on va travailler ta force avec un exercice spécial !\"", pnj.nom, joueur.nom);
+        println!("Voulez-vous commencer l'entraînement ? (o/n)");
+        let mut reponse = String::new();
+        io::stdin().read_line(&mut reponse).unwrap();
+        let reponse = reponse.trim().to_lowercase();
+        if reponse == "o" || reponse == "oui" {
+            println!("{} : \"Super ! Fais 20 pompes virtuelles ! ... C'est bien, tu progresses !\"", pnj.nom);
+            joueur.puissance += 10;
+            println!("Votre puissance augmente de 10 ! ({} points)", joueur.puissance);
+
+            // Si le joueur a un fruit, interaction spéciale
+            if let Some(fruit) = &mut joueur.fruit_de_demon {
+                println!("{} : \"Tu as un fruit du démon ! On va aussi entraîner tes attaques spéciales. Prêt pour un exercice de maîtrise du pouvoir '{}' ? (o/n)\"", pnj.nom, fruit.nom);
+                let mut rep_fruit = String::new();
+                io::stdin().read_line(&mut rep_fruit).unwrap();
+                let rep_fruit = rep_fruit.trim().to_lowercase();
+                if rep_fruit == "o" || rep_fruit == "oui" {
+                    println!("{} : \"Concentre ton énergie... et lance une attaque !\"", pnj.nom);
+                    for attaque_id in &fruit.attaque {
+                        for obj in objets.iter_mut() {
+                            if let Objet::Attaque(attaque) = obj {
+                                if &attaque.id == attaque_id {
+                                    attaque.puissance += 10;
+                                    println!("L'attaque '{}' gagne +10 puissance ({} points) !", attaque.nom, attaque.puissance);
+                                }
+                            }
+                        }
+                    }
+                    println!("Tes attaques de fruit du démon sont renforcées !");
+                } else {
+                    println!("{} : \"Dommage, tu t'entraîneras une prochaine fois sur tes pouvoirs.\"", pnj.nom);
+                }
+            }
+            println!("Entraînement terminé !");
+        } else {
+            println!("Vous refusez l'entraînement.");
+        }
+    } else {
+        println!("Aucun entraîneur n'est présent dans votre zone.");
+    }
+}
 
 
 
@@ -462,6 +521,7 @@ fn mini_jeu_devinette() {
 fn afficher_stats(joueur: &Joueur, objets: &[Objet]) {
     println!("--- Statistiques du joueur ---");
     println!("Nom         : {}", joueur.nom);
+    println!("Puissance   : {}", joueur.puissance);
     match &joueur.fruit_de_demon {
         Some(fruit) => {
             println!("Fruit       : {} ({})", fruit.nom, fruit.pouvoir);
@@ -592,7 +652,7 @@ fn main() {
         println!("5. Voir la description du lieu");
         println!("6. Capturer un fruit du démon");
         println!("7. Afficher les statistiques du joueur");
-        println!("8. Mini-jeux amusants");
+        println!("8. S'entraîner avec un PNJ entraîneur");
         println!("9. Quitter");
         print!("Votre choix : ");
         io::stdout().flush().unwrap();
@@ -666,28 +726,11 @@ fn main() {
                 }
             }
             "8" => {
-                loop {
-                    println!("\n--- Mini-jeux ---");
-                    println!("1. Devinette");
-                    println!("2. Pile ou face");
-                    println!("3. Calcul mental");
-                    println!("4. Retour au menu principal");
-                    print!("Votre choix : ");
-                    io::stdout().flush().unwrap();
-
-                    let mut jeu_choix = String::new();
-                    io::stdin().read_line(&mut jeu_choix).unwrap();
-                    let jeu_choix = jeu_choix.trim();
-
-                    match jeu_choix {
-                        "1" => mini_jeu_devinette(),
-                        "2" => mini_jeu_pile_ou_face(),
-                        "3" => mini_jeu_calcul(),
-                        "4" => break,
-                        _ => println!("Choix invalide."),
-                    }
+                // Test de l'entraînement
+                if let Some(joueur) = joueurs.get_mut(0) {
+                    entrainement(&mut objets, joueur);
                 }
-            }
+            },
             "9" => {
                 println!("Au revoir !");
                 break;

@@ -135,47 +135,46 @@ enum Objet {
 }
 
 fn show_objects_at_player_position(objets: &[Objet]) {
-    // Find the player and get their position
-    let mut player_position = None;
-    
+    // Trouver la sous-position du joueur
+    let mut player_sous_position = None;
+
     for obj in objets {
         if let Objet::Joueur(joueur) = obj {
-            player_position = Some(&joueur.position);
+            player_sous_position = Some(&joueur.sous_position);
             break;
         }
     }
-    
-    let player_position = match player_position {
+
+    let player_sous_position = match player_sous_position {
         Some(pos) => pos,
         None => {
             println!("Aucun joueur trouvé!");
             return;
         }
     };
-    
-    println!("À la position {} vous trouvez:", player_position);
-    
-    // Find objects at player's position
+
+    println!("Dans le sous-lieu '{}' vous trouvez :", player_sous_position);
+
     let mut found_something = false;
-    
+
     for obj in objets {
         match obj {
-            Objet::ObjetStatique(os) if os.position == *player_position => {
+            Objet::ObjetStatique(os) if os.sous_position == *player_sous_position => {
                 println!("  • Objet Statique: {} ({})", os.nom, os.id);
                 found_something = true;
             },
-            Objet::ObjetMobile(o) if o.position == *player_position => {
+            Objet::ObjetMobile(o) if o.sous_position == *player_sous_position => {
                 println!("  • Objet Mobile: {} ({})", o.nom, o.id);
                 found_something = true;
             },
-            Objet::Pnj(p) if p.position == *player_position => {
+            Objet::Pnj(p) if p.sous_position == *player_sous_position => {
                 println!("  • PNJ: {}", p.nom);
                 found_something = true;
             },
             _ => {}
         }
     }
-    
+
     if !found_something {
         println!("  Rien d'autre ici.");
     }
@@ -338,11 +337,11 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
     let mut player_index = None;
     let mut objets_a_ajouter = vec![];
 
-    // Trouver le joueur et sa position
-    let mut player_position = String::new();
+    // Trouver le joueur et sa sous_position
+    let mut player_sous_position = String::new();
     for (i, obj) in objets.iter().enumerate() {
         if let Objet::Joueur(joueur) = obj {
-            player_position = joueur.position.clone();
+            player_sous_position = joueur.sous_position.clone();
             player_index = Some(i);
             break;
         }
@@ -356,11 +355,11 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
         }
     };
 
-    // Trouver tous les objets statiques à la position du joueur
+    // Trouver tous les objets statiques au sous-lieu du joueur
     objets.retain(|obj| {
         match obj {
-            Objet::ObjetStatique(o) if o.position == player_position => {
-                println!("→ Objet '{}' capturé !", o.nom);
+            Objet::ObjetStatique(o) if o.sous_position == player_sous_position => {
+                println!("→ Objet '{}' capturé dans le sous-lieu !", o.nom);
                 objets_a_ajouter.push(o.clone());
                 false // retirer de la liste globale
             },
@@ -373,7 +372,7 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
         joueur.inventaire.extend(objets_a_ajouter);
     }
 
-    // Add synchronization at the end
+    // Synchronisation avec la structure joueurs
     for obj in objets {
         if let Objet::Joueur(j) = obj {
             if let Some(joueur) = joueurs.get_mut(0) {
@@ -396,13 +395,13 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
             aliments.iter().any(|a| nom.contains(a))
         }) {
             let gain_hp = if aliment.nom.to_lowercase().contains("pomme") {
-                20
+                15
             } else if aliment.nom.to_lowercase().contains("viande") {
                 30
             } else if aliment.nom.to_lowercase().contains("poisson") {
                 25
             } else if aliment.nom.to_lowercase().contains("boule de riz") {
-                15
+                20
             } else {
                 10
             };

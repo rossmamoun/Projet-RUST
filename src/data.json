@@ -24,7 +24,7 @@
         "nom": "Viande",
         "description": "La viande préférée de Luffy, redonne beaucoup d'énergie.",
         "position": "piece1",
-        "sous_position":"null",
+        "sous_position":"SEALABASTA",
         "is_key": false
     },
     {
@@ -207,5 +207,347 @@
         "position": "piece1",
         "sous_position": "NOALABASTA",
         "attaque": ["attaque1"]
+    },
+    {
+        "type": "souslieu",
+        "id": "SEALABASTA",
+        "nom": "Nanohana",
+        "description": "Port principal d'Alabasta où Luffy a rencontré Ace.",
+        "position": "piece1",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "NEALABASTA"
+            },
+            {
+                "orientation": "O",
+                "destination": "SOALABASTA"
+            }
+        ]
+    },
+
+    {
+        "type": "souslieu",
+        "id": "SOALABASTA",
+        "nom": "Yuba",
+        "description": "Oasis asséchée où vit le père de Vivi, Toto.",
+        "position": "piece1",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "NOALABASTA"
+            },
+            {
+                "orientation": "E",
+                "destination": "SEALABASTA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "NEALABASTA",
+        "nom": "Alubarna",
+        "description": "Capitale royale d'Alabasta, où se trouve le palais de Nefertari Cobra.",
+        "position": "piece1",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "SEALABASTA"
+            },
+            {
+                "orientation": "O",
+                "destination": "NOALABASTA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "NOALABASTA",
+        "nom": "Rain Base",
+        "description": "Ville casino abritant le repaire secret de Crocodile, le Rain Dinners.",
+        "position": "piece1",
+        "connections": [
+            {
+                "orientation": "E",
+                "destination": "NEALABASTA"
+            },
+            {
+                "orientation": "S",
+                "destination": "SOALABASTA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "MARINEQUARTIER",
+        "nom": "Quartier des Marines",
+        "description": "Zone où se rassemblent les marines ordinaires.",
+        "position": "piece2",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "BUREAUSENGOKU"
+            },
+            {
+                "orientation": "E",
+                "destination": "BAIEEXECUTION"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "BUREAUSENGOKU",
+        "nom": "Bureau de Sengoku",
+        "description": "Le quartier général où l'Amiral en chef dirige les opérations.",
+        "position": "piece2",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "MARINEQUARTIER"
+            },
+            {
+                "orientation": "E",
+                "destination": "PORTMARINFORD"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "BAIEEXECUTION",
+        "nom": "Baie d'exécution",
+        "description": "La plateforme où Ace devait être exécuté.",
+        "position": "piece2",
+        "connections": [
+            {
+                "orientation": "O",
+                "destination": "MARINEQUARTIER"
+            },
+            {
+                "orientation": "N",
+                "destination": "PORTMARINFORD"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "PORTMARINFORD",
+        "nom": "Port de Marine Ford",
+        "description": "Le port où sont amarrés les navires de la Marine.",
+        "position": "piece2",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "BAIEEXECUTION"
+            },
+            {
+                "orientation": "O",
+                "destination": "BUREAUSENGOKU"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "GALLEYTOM",
+        "nom": "Galley-La Company",
+        "description": "Le chantier naval dirigé par Iceburg.",
+        "position": "piece3",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "BLUSTATION"
+            },
+            {
+                "orientation": "E",
+                "destination": "CANALW7"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "BLUSTATION",
+        "nom": "Blue Station",
+        "description": "La gare où arrive le train des mers, Puffing Tom.",
+        "position": "piece3",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "GALLEYTOM"
+            },
+            {
+                "orientation": "E",
+                "destination": "FRANKYSHOUSE"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "CANALW7",
+        "nom": "Canaux principaux",
+        "description": "Les voies d'eau qui servent de rues à Water 7.",
+        "position": "piece3",
+        "connections": [
+            {
+                "orientation": "O",
+                "destination": "GALLEYTOM"
+            },
+            {
+                "orientation": "N",
+                "destination": "FRANKYSHOUSE"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "FRANKYSHOUSE",
+        "nom": "Repaire de Franky",
+        "description": "Le quartier général de la Franky Family.",
+        "position": "piece3",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "CANALW7"
+            },
+            {
+                "orientation": "O",
+                "destination": "BLUSTATION"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "COLISEE",
+        "nom": "Colisée Corrida",
+        "description": "L'arène où se déroule le tournoi pour le Mera Mera no Mi.",
+        "position": "piece4",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "PALAISROYAL"
+            },
+            {
+                "orientation": "E",
+                "destination": "QUARTIERFLEURS"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "PALAISROYAL",
+        "nom": "Palais Royal",
+        "description": "Le château où réside Doflamingo.",
+        "position": "piece4",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "COLISEE"
+            },
+            {
+                "orientation": "E",
+                "destination": "PORTDRESSROZA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "QUARTIERFLEURS",
+        "nom": "Quartier des Fleurs",
+        "description": "Le quartier résidentiel plein de jouets animés.",
+        "position": "piece4",
+        "connections": [
+            {
+                "orientation": "O",
+                "destination": "COLISEE"
+            },
+            {
+                "orientation": "N",
+                "destination": "PORTDRESSROZA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "PORTDRESSROZA",
+        "nom": "Port de Dressroza",
+        "description": "Le port principal de l'île.",
+        "position": "piece4",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "QUARTIERFLEURS"
+            },
+            {
+                "orientation": "O",
+                "destination": "PALAISROYAL"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "KURI",
+        "nom": "Région de Kuri",
+        "description": "Ancienne région dirigée par Kozuki Oden.",
+        "position": "piece5",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "CAPITALE"
+            },
+            {
+                "orientation": "E",
+                "destination": "UDON"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "CAPITALE",
+        "nom": "Capitale des Fleurs",
+        "description": "Le centre administratif de Wano où réside Orochi.",
+        "position": "piece5",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "KURI"
+            },
+            {
+                "orientation": "E",
+                "destination": "ONIGASHIMA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "UDON",
+        "nom": "Région d'Udon",
+        "description": "Zone des mines et des prisons où travaillent les prisonniers.",
+        "position": "piece5",
+        "connections": [
+            {
+                "orientation": "O",
+                "destination": "KURI"
+            },
+            {
+                "orientation": "N",
+                "destination": "ONIGASHIMA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "ONIGASHIMA",
+        "nom": "Île d'Onigashima",
+        "description": "Le repaire de Kaido et des Cent Bêtes.",
+        "position": "piece5",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "UDON"
+            },
+            {
+                "orientation": "O",
+                "destination": "CAPITALE"
+            }
+        ]
     }
+
 ]

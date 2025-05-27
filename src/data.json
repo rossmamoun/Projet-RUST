@@ -1,89 +1,140 @@
 [
     {
         "type": "Joueur",
+        "nom": "",
+        "fruit_de_demon": null,
         "position": "piece1",
-        "inventaire": []
+        "sous_position":"SEALABASTA",
+        "inventaire": [],
+        "puissance": 100,
+        "hp": 100
     },
     {
         "type": "ObjetStatique",
         "id": "objet2",
-        "nom": "Table",
-        "description": "Une table en bois.",
-        "position": "Piece1"
+        "nom": "Eau",
+        "description": "Eau potable.",
+        "position": "null",
+        "sous_position":"null",
+        "is_key": false
     },
     {
         "type":"ObjetMobile",
         "id":"objet1",
         "nom":"Bateau",
-        "description":"Un bateau en bois.",
-        "position":"Piece1"
+        "description":"vogue Merry",
+        "position":"piece1",
+        "sous_position":"SEALABASTA",
+        "is_key": false
     },
     {
         "type": "Pnj",
-        "nom": "Luffy",
-        "description": "Je suis le capitaine des pirates du chapeau de paille.",
-        "position": "Piece1"
+        "nom": "Vivi",
+        "description": "Princesse d'Alabasta.",
+        "position": "piece1",
+        "is_enemy": false,
+        "sous_position": "SEALABASTA",
+        "inventaire": ["objet2"],
+        "hp": 0,
+        "puissance": 0,
+        "attaques": []
+    },
+    {
+        "type": "Pnj",
+        "nom": "Crocodile",
+        "description": "Sashiburidana MUGIWARA.",
+        "position": "piece1",
+        "sous_position": "NOALABASTA",
+        "is_enemy": true,
+        "required_items": ["objet2"],
+        "inventaire": ["key1", "boniglife1"],
+        "hp": 100,
+        "puissance": 15,
+        "attaques": ["attaque2"]
+    },
+    {
+        "type": "Attaque",
+        "id": "attaque1",
+        "nom": "Gomu Gomu no Pistol",
+        "description": "Attaque de base de Luffy.",
+        "puissance": 40
+    },
+    {
+        "type": "Attaque",
+        "id": "attaque2",
+        "nom": "Attaque de Crocodile",
+        "description": "Attaque de base de Crocodile.",
+        "puissance": 70
     },
     {
         "type": "lieu",
         "id": "piece1",
-        "nom":"Marine Ford",
+        "nom":"Alabasta",
+        "description":"Un royaume désertique.",
+        "required_key": "??????",
         "connections": [
             {
-                "orientation": "N",
+                "orientation": "E",
                 "destination": "piece2"
             },
             {
-                "orientation": "E",
+                "orientation": "N",
                 "destination": "piece3"
-            },
-            {
-                "orientation": "S",
-                "destination": "piece4"
-            },
-            {
-                "orientation": "O",
-                "destination": "piece5"
             }
         ]
-        
-        
-           
-
     },
     {
         "type": "lieu",
         "id": "piece2",
-        "nom":"Alabasta",
+        "nom":"Marine Ford",
+        "description":"QG de la Marine.",
+        "required_key": "objet3",
         "connections": [
-            
-            {
-                "orientation": "S",
-                "destination": "piece1"
-            }
-        ]
-    },
-    {
-        "type": "lieu",
-        "id": "piece3",
-        "nom":"dressroza",
-        "connections": [
-            
             {
                 "orientation": "O",
                 "destination": "piece1"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece4"
             }
         ]
     },
     {
         "type": "lieu",
         "id": "piece4",
-        "nom":"skipia",
+        "nom":"Dressroza",
+        "description":"Île des jouets.",
+        "required_key": "??????",
         "connections": [
-            
+            {
+                "orientation": "S",
+                "destination": "piece2"
+            },
+            {
+                "orientation": "O",
+                "destination": "piece3"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece3",
+        "nom":"Water 7",
+        "description":"Ville des charpentiers.",
+        "required_key": "??????",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "piece1"
+            },
+            {
+                "orientation": "E",
+                "destination": "piece4"
+            },
             {
                 "orientation": "N",
-                "destination": "piece1"
+                "destination": "piece5"
             }
         ]
     },
@@ -91,13 +142,46 @@
         "type": "lieu",
         "id": "piece5",
         "nom":"Wano",
+        "description":"Île isolée du monde.",
+        "required_key": "??????",
         "connections": [
-            
             {
-                "orientation": "E",
-                "destination": "piece1"
+                "orientation": "S",
+                "destination": "piece3"
             }
         ]
+    },
+    {
+    "type": "FruitDuDemon",
+    "id": "gomu",
+    "nom": "Gomu Gomu no Mi",
+    "description": "Permet de transformer le corps en caoutchouc.",
+    "pouvoir": "Caoutchouc",
+    "position": "piece1",
+    "sous_position": "NEALABASTA",
+    "attaque": ["attaque1"]
+    },
+    {
+        "type": "FruitDuDemon",
+        "id": "yami",
+        "nom": "Yami Yami no Mi",
+        "description": "Permet de contrôler les ténèbres.",
+        "pouvoir": "Ténèbres",
+        "position": "piece1",
+        "sous_position": "NOALABASTA",
+        "attaque": ["attaque1"]
     }
 
+    ,
+    {
+        "type": "ObjetStatique",
+        "id": "objet3",
+        "nom": "Boussole",
+        "description": "Boussole magique qui indique la direction de la prochaine île.",
+        "position": "null",
+        "sous_position":"null",
+        "is_key": true
+    }
 ]
+
+

@@ -1,0 +1,121 @@
+[{
+    "type": "FruitDuDemon",
+    "id": "yami",
+    "nom": "Fruit des Ténèbres",
+    "description": "Permet de contrôler les ténèbres.",
+    "pouvoir": "Ténèbres",
+    "position": "piece1",
+    "sous_position": "NEALABASTA",
+    "attaque": ["yami1", "yami2"]
+}, 
+{
+    "type": "Attaque",
+    "id": "yami1",
+    "nom": "Ténèbres Englobantes",
+    "description": "Crée une zone de ténèbres qui immobilise l'ennemi.",
+    "puissance": 50
+}, 
+{
+    "type": "Attaque",
+    "id": "yami2",
+    "nom": "Grappin des Ténèbres",
+    "description": "Attrape l'ennemi avec des tentacules de ténèbres.",
+    "puissance": 40
+},
+{
+    "type": "FruitDuDemon",
+    "id": "ope",
+    "nom": "Fruit de l'Opération",
+    "description": "Permet de manipuler l'espace et les objets.",
+    "pouvoir": "Opération",
+    "position": "piece3",
+    "sous_position": "NEWATER7",
+    "attaque": ["ope1", "ope2"]
+}, 
+{
+    "type": "Attaque",
+    "id": "ope1",
+    "nom": "Chambre d'Opération",
+    "description": "Crée une zone où l'utilisateur peut manipuler les objets.",
+    "puissance": 5
+}, 
+{
+    "type": "Attaque",
+    "id": "ope2",
+    "nom": "Coup de Scalpel",
+    "description": "Inflige une coupure précise à l'ennemi.",
+    "puissance": 4
+},
+{
+    "type": "FruitDuDemon",
+    "id": "mera",
+    "nom": "Fruit du Feu",
+    "description": "Permet de contrôler le feu.",
+    "pouvoir": "Feu",
+    "position": "piece4",
+    "sous_position": "NEDRESSROSA",
+    "attaque": ["mera1", "mera2"]
+}, 
+{
+    "type": "Attaque",
+    "id": "mera1",
+    "nom": "Boule de Feu",
+    "description": "Lance une boule de feu sur l'ennemi.",
+    "puissance": 6
+}, 
+{
+    "type": "Attaque",
+    "id": "mera2",
+    "nom": "Mur de Flammes",
+    "description": "Crée un mur de flammes pour se protéger.",
+    "puissance": 5
+},
+{
+    "type": "FruitDuDemon",
+    "id": "ryu",
+    "nom": "Fruit du Dragon",
+    "description": "Permet de se transformer en dragon et de voler.",
+    "pouvoir": "Dragon",
+    "position": "piece5",
+    "sous_position": "SEWANO",
+    "attaque": ["ryu1", "ryu2"]
+}, 
+{
+    "type": "Attaque",
+    "id": "ryu1",
+    "nom": "Souffle de Dragon",
+    "description": "Lance un souffle de feu puissant.",
+    "puissance": 7
+}, 
+{
+    "type": "Attaque",
+    "id": "ryu2",
+    "nom": "Griffes du Dragon",
+    "description": "Inflige des dégâts avec les griffes du dragon.",
+    "puissance": 6
+},
+{
+    "type": "FruitDuDemon",
+    "id": "gomu",
+    "nom": "Gomu Gomu no Mi",   
+    "description": "Permet de transformer le corps en caoutchouc.",
+    "pouvoir": "Caoutchouc",
+    "position": "piece1",
+    "sous_position": "SEALABASTA",
+    "attaque": ["gomu1", "gomu2"]
+},
+{
+    "type": "Attaque",
+    "id": "gomu1",
+    "nom": "Gomu Gomu no Pistol",
+    "description": "Tire un coup de poing élastique.",
+    "puissance": 30
+}, 
+{
+    "type": "Attaque",
+    "id": "gomu2",
+    "nom": "Gomu Gomu no Bazooka",
+    "description": "Attaque puissante de Luffy.",
+    "puissance": 50
+}
+]

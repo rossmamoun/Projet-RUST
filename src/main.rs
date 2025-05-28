@@ -1300,6 +1300,10 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
         
         // Consommer l'aliment choisi
         let (index, aliment) = &aliments[choix - 1];
+        
+        // Vérifier si c'est du Saké de Wano
+        let est_sake = aliment.nom.contains("Saké");
+        
         let hp_avant = joueur.hp;
         joueur.hp = (joueur.hp + aliment.hp).min(100);
         let hp_gagne = joueur.hp - hp_avant;
@@ -1314,6 +1318,11 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
                 j.inventaire = joueur.inventaire.clone();
                 j.hp = joueur.hp;
             }
+        }
+        
+        // Appliquer l'effet d'ivresse si c'est du Saké
+        if est_sake {
+            effet_ivresse(joueurs, objets);
         }
     }
 }
@@ -1467,30 +1476,43 @@ fn mini_jeu_calcul() {
 
 
 fn main() {
-    let data = fs::read_to_string("data.json").expect("Impossible de lire le fichier");
-    let mut objets: Vec<Objet> = serde_json::from_str(&data).expect("Erreur de parsing JSON");
-
-
-    // Charger les aliments depuis le fichier aliments.json
-    match fs::read_to_string("aliments.json") {
-        Ok(aliments_data) => {
-            match serde_json::from_str::<Vec<Aliment>>(&aliments_data) {
-                Ok(aliments) => {
-                    println!("✅ {} aliments chargés avec succès!", aliments.len());
-                    // Convertir les aliments en objets et les ajouter à la liste des objets
-                    for aliment in aliments {
-                        objets.push(Objet::Aliment(aliment));
+    // Liste de tous les fichiers JSON à charger
+    let files = [
+        "joueur.json",
+        "lieu.json",
+        "sous_lieux.json",
+        "objetstatic.json",
+        "pnj.json", 
+        "fruitdemon.json",
+        "aliments.json",
+        "objetmobile.json",
+    ];
+    
+    // Structure pour stocker tous les objets du jeu
+    let mut objets: Vec<Objet> = Vec::new();
+    
+    // Charger chaque fichier et combiner les données
+    for filename in &files {
+        match fs::read_to_string(filename) {
+            Ok(content) => {
+                match serde_json::from_str::<Vec<Objet>>(&content) {
+                    Ok(parsed_objects) => {
+                        println!("✅ Fichier {} chargé : {} objets ajoutés", 
+                                 filename, parsed_objects.len());
+                        objets.extend(parsed_objects);
+                    },
+                    Err(e) => {
+                        println!("⚠️ Erreur de parsing JSON dans {} : {}", filename, e);
                     }
-                },
-                Err(e) => {
-                    println!("❌ Erreur lors du parsing du fichier aliments.json: {}", e);
                 }
+            },
+            Err(e) => {
+                println!("⚠️ Impossible de lire le fichier {} : {}", filename, e);
             }
-        },
-        Err(e) => {
-            println!("⚠️ Impossible de lire le fichier aliments.json: {}. Les aliments par défaut seront utilisés.", e);
         }
     }
+
+    println!("📦 Total des objets chargés : {}", objets.len());
 
     // Séparer les objets de type Joueur et Lieu
     let mut lieux: Vec<Lieu> = Vec::new();

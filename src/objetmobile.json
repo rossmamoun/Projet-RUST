@@ -1,0 +1,11 @@
+[
+    {
+        "type":"ObjetMobile",
+        "id":"objet1",
+        "nom":"Bateau",
+        "description":"vogue Merry",
+        "position":"piece1",
+        "sous_position":"SEALABASTA",
+        "is_key": false
+    }
+]

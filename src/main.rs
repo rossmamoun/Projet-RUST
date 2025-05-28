@@ -311,11 +311,51 @@ fn move_inside(
 fn move_joueur(
     joueur: &mut Joueur,
     direction: &str,
-    lieux: &Vec<Lieu>,
-    objets_mobiles: &mut Vec<ObjetMobile>,
-    objets_statiques: &mut Vec<ObjetStatique>,
     objets: &Vec<Objet>
 ) {
+
+
+        let mut lieux: Vec<Lieu> = Vec::new();
+    let mut objets_mobiles: Vec<ObjetMobile> = Vec::new();
+    let mut objets_statiques: Vec<ObjetStatique> = Vec::new();
+    let mut sous_lieux: Vec<SousLieu> = Vec::new();
+
+    for obj in objets {
+        match obj {
+            Objet::Lieu(lieu) => lieux.push(Lieu {
+                id: lieu.id.clone(),
+                nom: lieu.nom.clone(),
+                connections: lieu.connections.clone(),
+                required_key: lieu.required_key.clone(),
+                description: lieu.description.clone(),
+            }),
+            Objet::ObjetMobile(objet) => objets_mobiles.push(ObjetMobile {
+                nom: objet.nom.clone(),
+                position: objet.position.clone(),
+                description: objet.description.clone(),
+                id: objet.id.clone(),
+                sous_position: objet.sous_position.clone(),
+            }),
+            Objet::ObjetStatique(objet) => objets_statiques.push(ObjetStatique {
+                    nom: objet.nom.clone(),
+                    position: objet.position.clone(),
+                    description: objet.description.clone(),
+                    id: objet.id.clone(),
+                    sous_position: objet.sous_position.clone(),
+                    is_key: objet.is_key,
+                }),
+            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
+                nom: sous_lieu.nom.clone(),
+                position: sous_lieu.position.clone(),
+                description: sous_lieu.description.clone(),
+                id: sous_lieu.id.clone(),
+                connections: sous_lieu.connections.clone(),
+            }),
+            
+            
+            _ => {}
+        }
+    }
     if direction != "N" && direction != "S" && direction != "E" && direction != "O" {
         println!("Direction invalide. Utilisez N, S, E ou O.");
         return;
@@ -328,7 +368,7 @@ fn move_joueur(
     }
 
 
-    for lieu in lieux {
+    for lieu in &lieux {
         if lieu.id == joueur.position {
             if let Some(conn) = lieu.connections.iter().find(|c| c.orientation == direction) {
                 if let Some(destination_lieu) = lieux.iter().find(|l| l.id == conn.destination) {
@@ -353,24 +393,8 @@ fn move_joueur(
                     }
 
                     joueur.position =  destination_lieu.id.clone();
-                    let mut sous_lieux: Vec<SousLieu> = Vec::new();
+                        // Séparer les objets de type Joueur et Lieu
 
-                        // Extraire tous les sous-lieux distincts à partir des objets
-                    for obj in objets {
-                        match obj {
-                            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
-                                nom: sous_lieu.nom.clone(),
-                                position: sous_lieu.position.clone(),
-                                description: sous_lieu.description.clone(),
-                                id: sous_lieu.id.clone(),
-                                connections: sous_lieu.connections.clone(),
-                            }),
-            
-            
-                        _ => {}
-
-                        }
-                    }
 
                     // Rechercher le premier sous-lieu commençant par "SE" dans la nouvelle position
                     if let Some(sous_lieu_se) = sous_lieux.iter().find(|sl| sl.position == joueur.position && sl.id.starts_with("SE")) {
@@ -614,7 +638,7 @@ fn main() {
                     let mut dir = String::new();
                     io::stdin().read_line(&mut dir).unwrap();
                     let dir = dir.trim();
-                    move_joueur(joueur, dir, &lieux, &mut objets_mobiles, &mut objets_statiques, &objets);
+                    move_joueur(joueur, dir, &objets);
                     // Mettre à jour la position du joueur dans objets
                     for obj in &mut objets {
                         if let Objet::Joueur(j) = obj {

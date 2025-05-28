@@ -1,0 +1,74 @@
+[
+    {
+        "type": "ObjetStatique",
+        "id": "eau",
+        "nom": "Bouteille d'eau",
+        "description": "Une bouteille d'eau fraîche.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "poneglyphe1",
+        "nom": "Poneglyphe ancien",
+        "description": "Un Poneglyphe ancien gravé avec des inscriptions mystérieuses.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "clemarineford",
+        "nom": "Clé de Marineford",
+        "description": "Une clé qui ouvre une porte secrète à Marineford.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "map",
+        "nom": "Carte de Grand Line",
+        "description": "Une carte détaillée de Grand Line, utile pour naviguer.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "epe",
+        "nom": "Épée de Whitebeard",
+        "description": "Une épée légendaire appartenant à Whitebeard.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "poneglyphe2",
+        "nom": "Poneglyphe de Marineford",
+        "description": "Un Poneglyphe ancien gravé avec des inscriptions mystérieuses.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "poneglyphe3",
+        "nom": "Poneglyphe de Dressrosa",
+        "description": "Un Poneglyphe ancien gravé avec des inscriptions mystérieuses.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "poissonkoi",
+        "nom": "Poisson Koi",
+        "description": "Un poisson koi rare, symbole de chance.",
+        "position": "null",
+        "sous_position":"null"
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "poneglyphe4",
+        "nom": "Poneglyphe de Wano",
+        "description": "Un Poneglyphe ancien gravé avec des inscriptions mystérieuses.",
+        "position": "null",
+        "sous_position":"null"
+    }
+]

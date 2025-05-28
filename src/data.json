@@ -55,53 +55,8 @@
         "sous_position":"SEALABASTA",
         "is_key": false
     },
-    {
-        "type": "PnjAvecType",
-        "pnj": {
-            "nom": "Vivi",
-            "description": "Princesse d'Alabasta.",
-            "position": "piece1",
-            "sous_position": "SEALABASTA",
-            "inventaire": ["objet2"]
-        },
-        "type_de_pnj": {
-            "type": "Gentil",
-            "dialogue_special": "Je suis heureuse de vous rencontrer, capitaine"
-        }
-    },
-    {
-        "type": "PnjAvecType",
-        "pnj": {
-            "nom": "Crocodile",
-            "description": "Sashiburidana MUGIWARA.",
-            "position": "piece1",
-            "sous_position": "NOALABASTA",
-            "inventaire": ["boniglife1", "key1"]
-        },
-        "type_de_pnj": {
-            "type": "Ennemi",
-            "puissance": 15,
-            "hp": 100,
-            "attaques": ["attaque2"],
-            "required_items": ["objet2"]
-        }
-    },
-    {
-        "type": "PnjAvecType",
-        "pnj": {
-            "nom": "Rayleigh",
-            "description": "Le Seigneur des Ténèbres, ancien bras droit du roi des pirates.",
-            "position": "piece1",
-            "sous_position": "SEALABASTA",
-            "inventaire": []
-        },
-        "type_de_pnj": {
-            "type": "Entraineur",
-            "competence": "Haki",
-            "bonus_puissance": 20,
-            "niveau_requis": 50
-        }
-    },
+
+
     {
         "type": "ObjetStatique",
         "id": "key1",

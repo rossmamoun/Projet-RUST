@@ -681,7 +681,7 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
     let mut joueur_hp = joueur.hp;
     
     // Boucle de combat
-    while pnj_hp > 0 && joueur_hp > 0 {
+    while pnj_hp > 0 && joueur_hp > 30 {
         println!("\n--- Tour de combat ---");
         println!("{} - HP: {}", joueur.nom, joueur_hp);
         println!("{} - HP: {}", pnj_avec_type.pnj.nom, pnj_hp);
@@ -775,7 +775,7 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
         }
         
         // Vérifier si le joueur est vaincu
-        if joueur_hp == 0 {
+        if joueur_hp <= 30 {
             println!("\n💀 Défaite! Vous avez été vaincu par {}!", pnj_avec_type.pnj.nom);
             break;
         }

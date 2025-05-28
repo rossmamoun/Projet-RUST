@@ -181,7 +181,80 @@
         "position": "null",
         "sous_position":"null",
         "is_key": true
-    }
+    },
+
+
+    {
+    "type": "souslieu",
+    "id": "SEALABASTA",
+    "nom": "Sud-Est",
+    "description": "Quartier est du royaume d'Alabasta.",
+    "position": "piece1",
+    "connections": [
+        {
+            "orientation": "N",
+            "destination": "NEALABASTA"
+        },
+        {
+            "orientation": "O",
+            "destination": "SOALABASTA"
+        }
+    ]
+},
+
+
+    {
+    "type": "souslieu",
+    "id": "SOALABASTA",
+    "nom": "Sud-Ouest",
+    "description": "Quartier est du royaume d'Alabasta.",
+    "position": "piece1",
+    "connections": [
+        {
+            "orientation": "N",
+            "destination": "NOALABASTA"
+        },
+        {
+            "orientation": "E",
+            "destination": "SEALABASTA"
+        }
+    ]
+},
+{
+    "type": "souslieu",
+    "id": "NEALABASTA",
+    "nom": "Nord-Est",
+    "description": "Zone désertique à l'est de la capitale.",
+    "position": "piece1",
+    "connections": [
+        {
+            "orientation": "S",
+            "destination": "SEALABASTA"
+        },
+        {
+            "orientation": "O",
+            "destination": "NOALABASTA"
+        }
+    ]
+},
+{
+    "type": "souslieu",
+    "id": "NOALABASTA",
+    "nom": "Nord-Ouest",
+    "description": "Forteresse cachée de Baroque Works.",
+    "position": "piece1",
+    "connections": [
+        {
+            "orientation": "E",
+            "destination": "NEALABASTA"
+        },
+        {
+            "orientation": "S",
+            "destination": "SOALABASTA"
+        }
+    ]
+}
+
 ]
 
 

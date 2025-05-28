@@ -249,12 +249,72 @@ fn interact(objets: &[Objet], pnj_name: &str) {
 }
 
 
+/// Déplace le joueur dans une direction donnée, si une connexion existe.
+fn move_inside(
+    joueur: &mut Joueur,
+    orientation: &str,
+    objets: &Vec<Objet>,
+) -> Result<(), String> {
+
+    let mut sous_lieux: Vec<SousLieu> = Vec::new();
+
+    // Extraire tous les sous-lieux distincts à partir des objets
+    for obj in objets {
+        match obj {
+            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
+                nom: sous_lieu.nom.clone(),
+                position: sous_lieu.position.clone(),
+                description: sous_lieu.description.clone(),
+                id: sous_lieu.id.clone(),
+                connections: sous_lieu.connections.clone(),
+            }),
+            
+            
+            _ => {}
+        }
+    }
+
+    // Ensuite tu peux réutiliser la logique d’avant
+    let current_sous_lieu = sous_lieux
+        .iter()
+        .find(|sl| sl.id == joueur.sous_position && sl.position == joueur.position);
+
+    if let Some(sous_lieu) = current_sous_lieu {
+        if let Some(conn) = sous_lieu.connections.iter().find(|c| c.orientation == orientation) {
+            if sous_lieux
+                .iter()
+                .any(|sl| sl.id == conn.destination && sl.position == joueur.position)
+            {
+                joueur.sous_position = conn.destination.clone();
+                println!(
+                    "Le joueur se déplace vers le sous-lieu {} ({})",
+                    conn.destination, orientation
+                );
+                return Ok(());
+            } else {
+                return Err(format!(
+                    "La destination {} n'existe pas dans ce lieu.",
+                    conn.destination
+                ));
+            }
+        } else {
+            return Err(format!("Pas de connexion vers {}", orientation));
+        }
+    }
+
+    Err("Sous-lieu actuel introuvable.".to_string())
+}
+
+
+
+
 fn move_joueur(
     joueur: &mut Joueur,
     direction: &str,
     lieux: &Vec<Lieu>,
     objets_mobiles: &mut Vec<ObjetMobile>,
     objets_statiques: &mut Vec<ObjetStatique>,
+    objets: &Vec<Objet>
 ) {
     if direction != "N" && direction != "S" && direction != "E" && direction != "O" {
         println!("Direction invalide. Utilisez N, S, E ou O.");
@@ -292,7 +352,35 @@ fn move_joueur(
                         }
                     }
 
-                    joueur.position = destination_lieu.id.clone();
+                    joueur.position =  destination_lieu.id.clone();
+                    let mut sous_lieux: Vec<SousLieu> = Vec::new();
+
+                        // Extraire tous les sous-lieux distincts à partir des objets
+                    for obj in objets {
+                        match obj {
+                            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
+                                nom: sous_lieu.nom.clone(),
+                                position: sous_lieu.position.clone(),
+                                description: sous_lieu.description.clone(),
+                                id: sous_lieu.id.clone(),
+                                connections: sous_lieu.connections.clone(),
+                            }),
+            
+            
+                        _ => {}
+
+                        }
+                    }
+
+                    // Rechercher le premier sous-lieu commençant par "SE" dans la nouvelle position
+                    if let Some(sous_lieu_se) = sous_lieux.iter().find(|sl| sl.position == joueur.position && sl.id.starts_with("SE")) {
+                        joueur.sous_position = sous_lieu_se.id.clone();
+                    } else {
+                    // Si pas de SE-truc trouvé, tu peux soit rien faire, soit prendre le premier sous-lieu de l'île
+                        if let Some(any_sous_lieu) = sous_lieux.iter().find(|sl| sl.position == joueur.position) {
+                            joueur.sous_position = any_sous_lieu.id.clone();
+                        }
+                    }
 
                     for objet in objets_mobiles.iter_mut() {
                         if objet.nom == "Bateau" && objet.position == lieu.id {
@@ -301,6 +389,7 @@ fn move_joueur(
                         }
                     }
 
+                    //joueur.sous_position = destination_lieu.id.clone(); // Mettre à jour la sous-position du joueur
                     println!("Déplacement vers {}", destination_lieu.nom);
                     return;
                 }
@@ -451,6 +540,7 @@ fn main() {
     let mut joueurs: Vec<Joueur> = Vec::new();
     let mut objets_mobiles: Vec<ObjetMobile> = Vec::new();
     let mut objets_statiques: Vec<ObjetStatique> = Vec::new();
+    let mut sous_lieux: Vec<SousLieu> = Vec::new();
 
     for obj in &objets {
         match obj {
@@ -485,11 +575,19 @@ fn main() {
                     sous_position: objet.sous_position.clone(),
                     is_key: objet.is_key,
                 }),
+            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
+                nom: sous_lieu.nom.clone(),
+                position: sous_lieu.position.clone(),
+                description: sous_lieu.description.clone(),
+                id: sous_lieu.id.clone(),
+                connections: sous_lieu.connections.clone(),
+            }),
             
             
             _ => {}
         }
     }
+
 
     // Boucle de jeu interactive
     loop {
@@ -502,7 +600,8 @@ fn main() {
         println!("6. Afficher la carte du monde");
         println!("7. Afficher les statistiques du joueur");
         println!("8. Mini-jeux amusants");
-        println!("9. Quitter");
+        println!("9. Se deplacer dans l'ile");
+        println!("10. Quitter");
         print!("Votre choix : ");
         io::stdout().flush().unwrap();
 
@@ -518,7 +617,7 @@ fn main() {
                     let mut dir = String::new();
                     io::stdin().read_line(&mut dir).unwrap();
                     let dir = dir.trim();
-                    move_joueur(joueur, dir, &lieux, &mut objets_mobiles, &mut objets_statiques);
+                    move_joueur(joueur, dir, &lieux, &mut objets_mobiles, &mut objets_statiques, &objets);
                     // Mettre à jour la position du joueur dans objets
                     for obj in &mut objets {
                         if let Objet::Joueur(j) = obj {
@@ -551,7 +650,7 @@ fn main() {
                 if let Some(joueur) = joueurs.get(0) {
                     let pos = &joueur.position;
                     if let Some(lieu) = lieux.iter().find(|l| &l.id == pos) {
-                        println!("Vous êtes à : {} - {}", lieu.nom, lieu.id);
+                        println!("Vous êtes à : {} - {} - {}", lieu.nom, lieu.id, joueur.sous_position);
                         println!("{}", lieu.nom);
                         println!("Connexions :");
                         for conn in &lieu.connections {
@@ -595,6 +694,22 @@ fn main() {
                 }
             }
             "9" => {
+                // Déplacement
+                if let Some(joueur) = joueurs.get_mut(0) {
+                    println!("Dans quelle direction ? (N/S/E/O)");
+                    let mut dir = String::new();
+                    io::stdin().read_line(&mut dir).unwrap();
+                    let dir = dir.trim();
+                    move_inside(joueur, dir, &objets);
+                    // Mettre à jour la position du joueur dans objets
+                    for obj in &mut objets {
+                        if let Objet::Joueur(j) = obj {
+                            j.sous_position = joueur.sous_position.clone();
+                        }
+                    }
+                }
+            }
+            "10" => {
                 println!("Au revoir !");
                 break;
             }

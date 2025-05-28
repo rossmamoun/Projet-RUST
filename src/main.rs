@@ -321,9 +321,9 @@ fn move_joueur(
         return;
     }
 
-    let bateau_present = objets_mobiles.iter().any(|o| o.nom == "Bateau" && o.position == joueur.position);
+    let bateau_present = objets_mobiles.iter().any(|o| o.nom == "Bateau" && o.position == joueur.position && o.sous_position == joueur.sous_position);
     if !bateau_present {
-        println!("Il n'y a pas de bateau ici pour vous déplacer !");
+        println!("Il n'y a pas de bateau ici pour vous déplacer, cherchez le bateau.");
         return;
     }
 
@@ -375,19 +375,16 @@ fn move_joueur(
                     // Rechercher le premier sous-lieu commençant par "SE" dans la nouvelle position
                     if let Some(sous_lieu_se) = sous_lieux.iter().find(|sl| sl.position == joueur.position && sl.id.starts_with("SE")) {
                         joueur.sous_position = sous_lieu_se.id.clone();
-                    } else {
-                    // Si pas de SE-truc trouvé, tu peux soit rien faire, soit prendre le premier sous-lieu de l'île
-                        if let Some(any_sous_lieu) = sous_lieux.iter().find(|sl| sl.position == joueur.position) {
-                            joueur.sous_position = any_sous_lieu.id.clone();
+                        for objet in objets_mobiles.iter_mut() {
+                            if objet.nom == "Bateau" && objet.position == lieu.id {
+                                objet.position = destination_lieu.id.clone();
+                                objet.sous_position = sous_lieu_se.id.clone();
+                                break;
+                            }
                         }
                     }
 
-                    for objet in objets_mobiles.iter_mut() {
-                        if objet.nom == "Bateau" && objet.position == lieu.id {
-                            objet.position = destination_lieu.id.clone();
-                            break;
-                        }
-                    }
+                    
 
                     //joueur.sous_position = destination_lieu.id.clone(); // Mettre à jour la sous-position du joueur
                     println!("Déplacement vers {}", destination_lieu.nom);

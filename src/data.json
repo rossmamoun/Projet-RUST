@@ -7,7 +7,7 @@
         "sous_position":"SEALABASTA",
         "inventaire": [],
         "puissance": 100,
-        "hp": 100
+        "hp": 20
     },
     {
         "type": "ObjetStatique",
@@ -32,8 +32,8 @@
         "id": "objet3",
         "nom": "Pomme",
         "description": "La pomme redonne un peu d'énergie.",
-        "position": "piece2",
-        "sous_position": "MARINEQUARTIER",
+        "position": "piece1",
+        "sous_position": "SEALABASTA",
         "hp": 15
     },
     {

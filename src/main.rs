@@ -394,7 +394,7 @@ fn move_joueur(joueur: &mut Joueur, direction: &str, lieux: &Vec<Lieu>) {
 
 fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) {
     let mut player_index = None;
-    let mut objets_a_ajouter = vec![];
+    let mut objets_disponibles = Vec::new();
 
     // Trouver le joueur et sa sous_position
     let mut player_sous_position = String::new();
@@ -414,26 +414,78 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
         }
     };
 
-    // Trouver tous les objets statiques ET les aliments au sous-lieu du joueur
-    objets.retain(|obj| {
+    // Collecter tous les objets dans le sous-lieu du joueur
+    for obj in objets.iter() {
         match obj {
             Objet::ObjetStatique(o) if o.sous_position == player_sous_position => {
-                println!("→ Objet '{}' capturé dans le sous-lieu !", o.nom);
-                
-                // Convertir en ObjetInventaire::ObjetStatique
-                let inv_obj = ObjetInventaire::ObjetStatique(o.clone());
-                objets_a_ajouter.push(inv_obj);
-                false // retirer de la liste globale
+                objets_disponibles.push((
+                    "ObjetStatique",
+                    o.id.clone(),
+                    format!("Objet: {}", o.nom)
+                ));
             },
             Objet::Aliment(a) if a.sous_position == player_sous_position => {
-                println!("→ Aliment '{}' (+{} HP) capturé dans le sous-lieu !", a.nom, a.hp);
-                
-                // Convertir en ObjetInventaire::Aliment
-                let inv_obj = ObjetInventaire::Aliment(a.clone());
-                objets_a_ajouter.push(inv_obj);
-                false // retirer de la liste globale
+                objets_disponibles.push((
+                    "Aliment",
+                    a.id.clone(),
+                    format!("Aliment: {} (+{} HP)", a.nom, a.hp)
+                ));
             },
-            _ => true,
+            _ => {}
+        }
+    }
+
+    if objets_disponibles.is_empty() {
+        println!("Aucun objet à ramasser dans ce sous-lieu.");
+        return;
+    }
+
+    // Afficher les options
+    println!("Objets disponibles:");
+    println!("0. Tout ramasser");
+    for (i, (_, _, desc)) in objets_disponibles.iter().enumerate() {
+        println!("{}. {}", i + 1, desc);
+    }
+    
+    println!("Que voulez-vous ramasser? (0-{})", objets_disponibles.len());
+    let mut choix = String::new();
+    io::stdin().read_line(&mut choix).expect("Erreur de lecture");
+    let choix: usize = match choix.trim().parse() {
+        Ok(num) if num <= objets_disponibles.len() => num,
+        _ => {
+            println!("Choix invalide. Rien n'a été ramassé.");
+            return;
+        }
+    };
+
+    let mut ids_a_capturer = Vec::new();
+    if choix == 0 {
+        // Ramasser tous les objets
+        for (_, id, _) in &objets_disponibles {
+            ids_a_capturer.push(id.clone());
+        }
+    } else {
+        // Ramasser un seul objet
+        ids_a_capturer.push(objets_disponibles[choix - 1].1.clone());
+    }
+
+    // Collecter les objets à capturer et les convertir en ObjetInventaire
+    let mut objets_a_ajouter = vec![];
+    
+    // On va maintenant retenir les objets qui ne sont pas capturés
+    objets.retain(|obj| {
+        match obj {
+            Objet::ObjetStatique(o) if ids_a_capturer.contains(&o.id) => {
+                println!("→ Objet '{}' capturé dans le sous-lieu !", o.nom);
+                objets_a_ajouter.push(ObjetInventaire::ObjetStatique(o.clone()));
+                false // Retirer cet objet
+            },
+            Objet::Aliment(a) if ids_a_capturer.contains(&a.id) => {
+                println!("→ Aliment '{}' (+{} HP) capturé dans le sous-lieu !", a.nom, a.hp);
+                objets_a_ajouter.push(ObjetInventaire::Aliment(a.clone()));
+                false // Retirer cet objet
+            },
+            _ => true, // Garder cet objet
         }
     });
 
@@ -459,37 +511,55 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
             return;
         }
         
-        // Chercher un aliment dans l'inventaire (uniquement Aliment)
-        if let Some((index, item)) = joueur.inventaire.iter().enumerate().find(|(_, inv_obj)| {
-            matches!(inv_obj, ObjetInventaire::Aliment(_))
-        }) {
-            // Obtenir le nom et les HP directement depuis l'aliment
-            if let ObjetInventaire::Aliment(aliment) = &item {
-                let nom = &aliment.nom;
-                let gain_hp = aliment.hp;
-                
-                let hp_avant = joueur.hp;
-                joueur.hp = (joueur.hp + gain_hp).min(100);
-                let hp_gagne = joueur.hp - hp_avant;
-                
-                println!("🍽️ Vous consommez : {}", nom);
-                println!("❤️  Vous regagnez {} HP ! HP actuel : {}", hp_gagne, joueur.hp);
-                joueur.inventaire.remove(index);
-
-                // Synchronisation avec la liste globale d'objets
-                for obj in objets.iter_mut() {
-                    if let Objet::Joueur(j) = obj {
-                        j.inventaire = joueur.inventaire.clone();
-                        j.hp = joueur.hp;
-                    }
-                }
+        // Collecter tous les aliments dans l'inventaire
+        let mut aliments = Vec::new();
+        for (i, item) in joueur.inventaire.iter().enumerate() {
+            if let ObjetInventaire::Aliment(a) = item {
+                aliments.push((i, a));
             }
-        } else {
+        }
+        
+        if aliments.is_empty() {
             println!("Vous n'avez pas d'aliment à consommer !");
+            return;
+        }
+        
+        // Afficher les options
+        println!("Aliments disponibles:");
+        for (i, (_, a)) in aliments.iter().enumerate() {
+            println!("{}. {} (+{} HP)", i + 1, a.nom, a.hp);
+        }
+        
+        println!("Que voulez-vous consommer? (1-{})", aliments.len());
+        let mut choix = String::new();
+        io::stdin().read_line(&mut choix).expect("Erreur de lecture");
+        let choix: usize = match choix.trim().parse() {
+            Ok(num) if num >= 1 && num <= aliments.len() => num,
+            _ => {
+                println!("Choix invalide. Rien n'a été consommé.");
+                return;
+            }
+        };
+        
+        // Consommer l'aliment choisi
+        let (index, aliment) = &aliments[choix - 1];
+        let hp_avant = joueur.hp;
+        joueur.hp = (joueur.hp + aliment.hp).min(100);
+        let hp_gagne = joueur.hp - hp_avant;
+        
+        println!("🍽️ Vous consommez : {}", aliment.nom);
+        println!("❤️  Vous regagnez {} HP ! HP actuel : {}", hp_gagne, joueur.hp);
+        joueur.inventaire.remove(*index);
+        
+        // Synchronisation avec la liste globale d'objets
+        for obj in objets.iter_mut() {
+            if let Objet::Joueur(j) = obj {
+                j.inventaire = joueur.inventaire.clone();
+                j.hp = joueur.hp;
+            }
         }
     }
 }
-
 
 fn mini_jeu_devinette() {
     use rand::Rng;

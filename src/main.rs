@@ -29,6 +29,7 @@ struct Aliment {
     hp: u32, // Points de vie restaurés
 }
 
+
 #[derive(Debug, Deserialize, Clone)]
 struct ObjetMobile {
     id: String,
@@ -64,7 +65,7 @@ struct Joueur {
     fruit_de_demon: Option<FruitDuDemon>,
     position: String,
     sous_position:String,
-    inventaire: Vec<ObjetStatique>,
+    inventaire: Vec<ObjetInventaire>,
     puissance: u32,
     hp: u32
 }
@@ -95,6 +96,16 @@ struct Lieu {
     description: String,
     connections: Vec<Connection>,
     required_key: String, // Clé requise pour accéder à ce lieu
+}
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(tag = "type_inventaire")]
+enum ObjetInventaire {
+    #[serde(rename = "objet")]
+    ObjetStatique(ObjetStatique),
+    
+    #[serde(rename = "aliment")]
+    Aliment(Aliment)
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -159,14 +170,37 @@ fn show_objects_at_player_position(objets: &[Objet], lieux: &[Lieu], joueur: &Jo
     // Afficher le sous-lieu si présent
     let mut souslieu_trouve = false;
     for obj in objets {
-        if let Objet::SousLieu(sl) = obj {
-            if &sl.position == pos && &sl.id == sous_pos {
-                println!("\nSous-lieu : {} - {}", sl.nom, sl.id);
-                println!("{}", sl.description);
-                souslieu_trouve = true;
+    if let Objet::SousLieu(sl) = obj {
+        if &sl.position == pos && &sl.id == sous_pos {
+            println!("\nSous-lieu : {} - {}", sl.nom, sl.id);
+            println!("{}", sl.description);
+            // Afficher les connexions du sous-lieu
+            if !sl.connections.is_empty() {
+                println!("Connexions du sous-lieu :");
+                for conn in &sl.connections {
+                    // Chercher le nom du sous-lieu ou lieu de destination
+                    let nom_dest = objets.iter().filter_map(|o| {
+                        if let Objet::SousLieu(sousl) = o {
+                            if sousl.id == conn.destination {
+                                return Some(sousl.nom.as_str());
+                            }
+                        }
+                        if let Objet::Lieu(lieu) = o {
+                            if lieu.id == conn.destination {
+                                return Some(lieu.nom.as_str());
+                            }
+                        }
+                        None
+                    }).next().unwrap_or("Lieu inconnu");
+                    println!("  -> {} vers {} ({})", conn.orientation, nom_dest, conn.destination);
+                }
+            } else {
+                println!("Aucune connexion depuis ce sous-lieu.");
             }
+            souslieu_trouve = true;
         }
     }
+}
     if !souslieu_trouve {
         println!("\nAucun sous-lieu spécifique ici.");
     }
@@ -703,13 +737,13 @@ fn main() {
                 let nom = nom.trim();
                 interact(&mut objets, nom, &mut joueurs);  // Maintenant avec &mut
             }
-            "4" => {
+            /*"4" => {
                 // Inventaire
                 if let Some(joueur) = joueurs.get(0) {
                     let noms_inventaire: Vec<&String> = joueur.inventaire.iter().map(|o| &o.nom).collect();
                     println!("Inventaire : {:?}", noms_inventaire);
                 }
-            }
+            }*/
             "5" => {
                  // Description du lieu, sous-lieu et objets/PNJ du sous-lieu
                 if let Some(joueur) = joueurs.get(0) {

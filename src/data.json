@@ -19,6 +19,24 @@
         "is_key": false
     },
     {
+        "type": "aliment",
+        "id": "objet4",
+        "nom": "Viande",
+        "description": "La viande préférée de Luffy, redonne beaucoup d'énergie.",
+        "position": "piece1",
+        "sous_position": "SEALABASTA",
+        "hp": 30
+    },
+    {
+        "type": "aliment",
+        "id": "objet3",
+        "nom": "Pomme",
+        "description": "La pomme redonne un peu d'énergie.",
+        "position": "piece1",
+        "sous_position": "SEALABASTA",
+        "hp": 15
+    },
+    {
         "type":"ObjetMobile",
         "id":"objet1",
         "nom":"Bateau",
@@ -162,21 +180,78 @@
             }
         ]
     },
-    {
+
+        {
         "type": "souslieu",
         "id": "SEALABASTA",
-        "nom": "Palais Royal",
+        "nom": "Sud-Est",
+        "description": "Quartier est du royaume d'Alabasta.",
         "position": "piece1",
-        "description": "Le palais où réside la famille royale d'Alabasta.",
-        "connections": []
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "NEALABASTA"
+            },
+            {
+                "orientation": "O",
+                "destination": "SOALABASTA"
+            }
+        ]
+    },
+
+
+
+
+        {
+        "type": "souslieu",
+        "id": "SOALABASTA",
+        "nom": "Sud-Ouest",
+        "description": "Quartier est du royaume d'Alabasta.",
+        "position": "piece1",
+        "connections": [
+            {
+                "orientation": "N",
+                "destination": "NOALABASTA"
+            },
+            {
+                "orientation": "E",
+                "destination": "SEALABASTA"
+            }
+        ]
+    },
+    {
+        "type": "souslieu",
+        "id": "NEALABASTA",
+        "nom": "Nord-Est",
+        "description": "Zone désertique à l'est de la capitale.",
+        "position": "piece1",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "SEALABASTA"
+            },
+            {
+                "orientation": "O",
+                "destination": "NOALABASTA"
+            }
+        ]
     },
     {
         "type": "souslieu",
         "id": "NOALABASTA",
-        "nom": "Désert d'Alabasta",
+        "nom": "Nord-Ouest",
+        "description": "Forteresse cachée de Baroque Works.",
         "position": "piece1",
-        "description": "Un désert aride et dangereux.",
-        "connections": []
+        "connections": [
+            {
+                "orientation": "E",
+                "destination": "NEALABASTA"
+            },
+            {
+                "orientation": "S",
+                "destination": "SOALABASTA"
+            }
+        ]
     },
     {
     "type": "FruitDuDemon",

@@ -819,26 +819,180 @@ fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) 
 }
 
 
-fn move_joueur(joueur: &mut Joueur, direction: &str, lieux: &Vec<Lieu>) {
-    if(direction != "N" && direction != "S" && direction != "E" && direction != "O") {
+fn move_inside(
+    joueur: &mut Joueur,
+    orientation: &str,
+    objets: &Vec<Objet>,
+) -> Result<(), String> {
+
+    let mut sous_lieux: Vec<SousLieu> = Vec::new();
+
+    // Extraire tous les sous-lieux distincts à partir des objets
+    for obj in objets {
+        match obj {
+            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
+                nom: sous_lieu.nom.clone(),
+                position: sous_lieu.position.clone(),
+                description: sous_lieu.description.clone(),
+                id: sous_lieu.id.clone(),
+                connections: sous_lieu.connections.clone(),
+            }),
+            
+            
+            _ => {}
+        }
+    }
+
+    // Ensuite tu peux réutiliser la logique d’avant
+    let current_sous_lieu = sous_lieux
+        .iter()
+        .find(|sl| sl.id == joueur.sous_position && sl.position == joueur.position);
+
+    if let Some(sous_lieu) = current_sous_lieu {
+        if let Some(conn) = sous_lieu.connections.iter().find(|c| c.orientation == orientation) {
+            if sous_lieux
+                .iter()
+                .any(|sl| sl.id == conn.destination && sl.position == joueur.position)
+            {
+                joueur.sous_position = conn.destination.clone();
+                println!(
+                    "Le joueur se déplace vers le sous-lieu {} ({})",
+                    conn.destination, orientation
+                );
+                return Ok(());
+            } else {
+                return Err(format!(
+                    "La destination {} n'existe pas dans ce lieu.",
+                    conn.destination
+                ));
+            }
+        } else {
+            return Err(format!("Pas de connexion vers {}", orientation));
+        }
+    }
+
+    Err("Sous-lieu actuel introuvable.".to_string())
+}
+
+
+
+
+fn move_joueur(
+    joueur: &mut Joueur,
+    direction: &str,
+    objets: &Vec<Objet>
+) {
+
+
+        let mut lieux: Vec<Lieu> = Vec::new();
+    let mut objets_mobiles: Vec<ObjetMobile> = Vec::new();
+    let mut objets_statiques: Vec<ObjetStatique> = Vec::new();
+    let mut sous_lieux: Vec<SousLieu> = Vec::new();
+
+    for obj in objets {
+        match obj {
+            Objet::Lieu(lieu) => lieux.push(Lieu {
+                id: lieu.id.clone(),
+                nom: lieu.nom.clone(),
+                connections: lieu.connections.clone(),
+                required_key: lieu.required_key.clone(),
+                description: lieu.description.clone(),
+            }),
+            Objet::ObjetMobile(objet) => objets_mobiles.push(ObjetMobile {
+                nom: objet.nom.clone(),
+                position: objet.position.clone(),
+                description: objet.description.clone(),
+                id: objet.id.clone(),
+                sous_position: objet.sous_position.clone(),
+            }),
+            Objet::ObjetStatique(objet) => objets_statiques.push(ObjetStatique {
+                    nom: objet.nom.clone(),
+                    position: objet.position.clone(),
+                    description: objet.description.clone(),
+                    id: objet.id.clone(),
+                    sous_position: objet.sous_position.clone(),
+                }),
+            Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
+                nom: sous_lieu.nom.clone(),
+                position: sous_lieu.position.clone(),
+                description: sous_lieu.description.clone(),
+                id: sous_lieu.id.clone(),
+                connections: sous_lieu.connections.clone(),
+            }),
+            
+            
+            _ => {}
+        }
+    }
+    if direction != "N" && direction != "S" && direction != "E" && direction != "O" {
         println!("Direction invalide. Utilisez N, S, E ou O.");
         return;
     }
-    // Parcourir les lieux pour trouver celui où le joueur se trouve
-    for lieu in lieux {
+
+    let bateau_present = objets_mobiles.iter().any(|o| o.nom == "Bateau" && o.position == joueur.position && o.sous_position == joueur.sous_position);
+    if !bateau_present {
+        println!("Il n'y a pas de bateau ici pour vous déplacer, cherchez le bateau.");
+        return;
+    }
+
+
+    for lieu in &lieux {
         if lieu.id == joueur.position {
-            // Chercher la connexion qui correspond à la direction
-            if let Some(conn) = lieu.connections.iter().find(|&conn| conn.orientation == direction) {
-                joueur.position = conn.destination.clone();
-                println!("Déplacement du joueur vers {}", conn.destination);
-                return; 
+            if let Some(conn) = lieu.connections.iter().find(|c| c.orientation == direction) {
+                if let Some(destination_lieu) = lieux.iter().find(|l| l.id == conn.destination) {
+                    // Vérifie si une clé est requise
+                    if !destination_lieu.required_key.is_empty() {
+                        let a_cle = joueur.inventaire.iter().any(|obj| match obj {
+                            ObjetInventaire::ObjetStatique(o) => o.id == destination_lieu.required_key,
+                            ObjetInventaire::Aliment(a) => a.id == destination_lieu.required_key,
+                        });
+                        if !a_cle {
+                            // 🔍 Chercher l’objet statique correspondant à la clé
+                            if let Some(objet) = objets_statiques.iter().find(|o| o.id == destination_lieu.required_key) {
+                                println!(
+                                    "Vous avez besoin de la clé '{}' pour entrer dans ce lieu !\n→ Description : {}",
+                                    objet.nom, objet.description
+                                );
+                            } else {
+                                println!(
+                                    "Clé requise non trouvée dans la base d'objets : ID '{}'",
+                                    destination_lieu.required_key
+                                );
+                            }
+                            return;
+                        }
+                    }
+
+                    joueur.position =  destination_lieu.id.clone();
+                        // Séparer les objets de type Joueur et Lieu
+
+
+                    // Rechercher le premier sous-lieu commençant par "SE" dans la nouvelle position
+                    if let Some(sous_lieu_se) = sous_lieux.iter().find(|sl| sl.position == joueur.position && sl.id.starts_with("SE")) {
+                        joueur.sous_position = sous_lieu_se.id.clone();
+                        for objet in objets_mobiles.iter_mut() {
+                            if objet.nom == "Bateau" && objet.position == lieu.id {
+                                objet.position = destination_lieu.id.clone();
+                                objet.sous_position = sous_lieu_se.id.clone();
+                                break;
+                            }
+                        }
+                    }
+
+                    
+
+                    //joueur.sous_position = destination_lieu.id.clone(); // Mettre à jour la sous-position du joueur
+                    println!("Déplacement vers {}", destination_lieu.nom);
+                    return;
+                }
             } else {
-                println!("Le joueur ne peut pas aller dans cette direction car il n'y a pas de destination.");
-                return;  
+                println!("Aucune connexion dans cette direction !");
+                return;
             }
         }
     }
-    println!("Le joueur ne se trouve dans aucun lieu valide.");
+
+    println!("Lieu actuel invalide !");
 }
 
 
@@ -1221,6 +1375,7 @@ fn main() {
         println!("7. Afficher les statistiques du joueur");
         println!("8. Mini-jeux amusants");
         println!("9. Consommer un aliment");
+        println!("10. Se déplacer à l'intérieur d'un lieu");
         println!("Q. Quitter");
         print!("Votre choix : ");
         io::stdout().flush().unwrap();
@@ -1237,7 +1392,7 @@ fn main() {
                     let mut dir = String::new();
                     io::stdin().read_line(&mut dir).unwrap();
                     let dir = dir.trim();
-                    move_joueur(joueur, dir, &lieux);
+                    move_joueur(joueur, dir, &objets);
                     // Mettre à jour la position du joueur dans objets
                     for obj in &mut objets {
                         if let Objet::Joueur(j) = obj {
@@ -1334,6 +1489,23 @@ fn main() {
             "9" => {
                 consommer_aliment(&mut joueurs, &mut objets);
             }
+            "10" => {
+                // Déplacement
+                if let Some(joueur) = joueurs.get_mut(0) {
+                    println!("Dans quelle direction ? (N/S/E/O)");
+                    let mut dir = String::new();
+                    io::stdin().read_line(&mut dir).unwrap();
+                    let dir = dir.trim();
+                    move_inside(joueur, dir, &objets);
+                    // Mettre à jour la position du joueur dans objets
+                    for obj in &mut objets {
+                        if let Objet::Joueur(j) = obj {
+                            j.sous_position = joueur.sous_position.clone();
+                        }
+                    }
+                }
+            }
+
             "Q" => {
                 println!("Au revoir !");
                 break;

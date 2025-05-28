@@ -498,49 +498,84 @@ enum Objet {
     Attaque(Attaque),
 }
 
-fn show_objects_at_player_position(objets: &[Objet]) {
-    // Find the player and get their position
-    let mut player_position = None;
-    
-    for obj in objets {
-        if let Objet::Joueur(joueur) = obj {
-            player_position = Some(&joueur.position);
-            break;
+fn show_objects_at_player_position(objets: &[Objet], lieux: &[Lieu], joueur: &Joueur) {
+    let pos = &joueur.position;
+    let sous_pos = &joueur.sous_position;
+
+    // Afficher le lieu principal
+    if let Some(lieu) = lieux.iter().find(|l| &l.id == pos) {
+        println!("Vous êtes à : {} - {}", lieu.nom, lieu.id);
+        println!("{}", lieu.description);
+        println!("Connexions :");
+        for conn in &lieu.connections {
+            // Chercher le nom du lieu de destination
+            let nom_dest = lieux.iter()
+                .find(|l| l.id == conn.destination)
+                .map(|l| l.nom.as_str())
+                .unwrap_or("Lieu inconnu");
+            println!("  -> {} vers {} ({})", conn.orientation, nom_dest, conn.destination);
         }
     }
-    
-    let player_position = match player_position {
-        Some(pos) => pos,
-        None => {
-            println!("Aucun joueur trouvé!");
-            return;
+
+    // Afficher le sous-lieu si présent
+    let mut souslieu_trouve = false;
+    for obj in objets {
+    if let Objet::SousLieu(sl) = obj {
+        if &sl.position == pos && &sl.id == sous_pos {
+            println!("\nSous-lieu : {} - {}", sl.nom, sl.id);
+            println!("{}", sl.description);
+            // Afficher les connexions du sous-lieu
+            if !sl.connections.is_empty() {
+                println!("Connexions du sous-lieu :");
+                for conn in &sl.connections {
+                    // Chercher le nom du sous-lieu ou lieu de destination
+                    let nom_dest = objets.iter().filter_map(|o| {
+                        if let Objet::SousLieu(sousl) = o {
+                            if sousl.id == conn.destination {
+                                return Some(sousl.nom.as_str());
+                            }
+                        }
+                        if let Objet::Lieu(lieu) = o {
+                            if lieu.id == conn.destination {
+                                return Some(lieu.nom.as_str());
+                            }
+                        }
+                        None
+                    }).next().unwrap_or("Lieu inconnu");
+                    println!("  -> {} vers {} ({})", conn.orientation, nom_dest, conn.destination);
+                }
+            } else {
+                println!("Aucune connexion depuis ce sous-lieu.");
+            }
+            souslieu_trouve = true;
         }
-    };
-    
-    println!("À la position {} vous trouvez:", player_position);
-    
-    // Find objects at player's position
-    let mut found_something = false;
-    
+    }
+}
+    if !souslieu_trouve {
+        println!("\nAucun sous-lieu spécifique ici.");
+    }
+
+    // Afficher les objets et PNJ du sous-lieu
+    println!("\nDans ce sous-lieu, vous trouvez :");
+    let mut found = false;
     for obj in objets {
         match obj {
-            Objet::ObjetStatique(os) if os.position == *player_position => {
-                println!("  • Objet Statique: {} ({})", os.nom, os.id);
-                found_something = true;
-            },
-            Objet::ObjetMobile(o) if o.position == *player_position => {
+            Objet::ObjetStatique(o) if &o.position == pos && &o.sous_position == sous_pos => {
+                println!("  • Objet Statique: {} ({})", o.nom, o.id);
+                found = true;
+            }
+            Objet::ObjetMobile(o) if &o.position == pos && &o.sous_position == sous_pos => {
                 println!("  • Objet Mobile: {} ({})", o.nom, o.id);
-                found_something = true;
-            },
-            Objet::Pnj(p) if p.position == *player_position => {
+                found = true;
+            }
+            Objet::Pnj(p) if &p.position == pos && &p.sous_position == sous_pos => {
                 println!("  • PNJ: {}", p.nom);
-                found_something = true;
-            },
+                found = true;
+            }
             _ => {}
         }
     }
-    
-    if !found_something {
+    if !found {
         println!("  Rien d'autre ici.");
     }
 }
@@ -1435,19 +1470,10 @@ fn main() {
                 }
             }
             "5" => {
-                // Description du lieu
+                 // Description du lieu, sous-lieu et objets/PNJ du sous-lieu
                 if let Some(joueur) = joueurs.get(0) {
-                    let pos = &joueur.position;
-                    if let Some(lieu) = lieux.iter().find(|l| &l.id == pos) {
-                        println!("Vous êtes à : {} - {}", lieu.nom, lieu.id);
-                        println!("{}", lieu.nom);
-                        println!("Connexions :");
-                        for conn in &lieu.connections {
-                            println!("  -> {} vers {}", conn.orientation, conn.destination);
-                        }
-                    }
+                    show_objects_at_player_position(&objets, &lieux, joueur);
                 }
-                show_objects_at_player_position(&objets);
             }
             "6" => {
                 // Capturer un fruit du démon

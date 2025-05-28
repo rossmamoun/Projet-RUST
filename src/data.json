@@ -163,6 +163,22 @@
         ]
     },
     {
+        "type": "souslieu",
+        "id": "SEALABASTA",
+        "nom": "Palais Royal",
+        "position": "piece1",
+        "description": "Le palais où réside la famille royale d'Alabasta.",
+        "connections": []
+    },
+    {
+        "type": "souslieu",
+        "id": "NOALABASTA",
+        "nom": "Désert d'Alabasta",
+        "position": "piece1",
+        "description": "Un désert aride et dangereux.",
+        "connections": []
+    },
+    {
     "type": "FruitDuDemon",
     "id": "gomu",
     "nom": "Gomu Gomu no Mi",

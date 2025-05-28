@@ -406,16 +406,27 @@ impl PnjAvecType {
 
     // Interaction spécifique pour les PNJ entraîneurs
     fn interact_as_entraineur(&mut self, objets: &mut Vec<Objet>, player_index: usize, joueurs: &mut Vec<Joueur>) -> String {
-        let mut result = String::new();
-        
+        // Afficher immédiatement les messages d'introduction
         if let PnjType::Entraineur { ref competence, ref bonus_puissance, ref niveau_requis } = self.type_de_pnj {
-            result.push_str(&format!("{} peut vous entraîner en {} et améliorer votre puissance de {}!\n", 
-                            self.pnj.nom, competence, bonus_puissance));
+            println!("Vous interagissez avec {} :", self.pnj.nom);
+            println!("\"{}\"", self.pnj.description);
+            println!("{} peut vous entraîner en {} et améliorer votre puissance de {} !", 
+                     self.pnj.nom, competence, bonus_puissance);
             
+            // Vérifier les prérequis pour l'entraînement
             if let Some(Objet::Joueur(joueur)) = objets.get(player_index) {
                 if joueur.hp >= *niveau_requis {
-                    result.push_str("Voulez-vous vous entraîner? (o/n)");
+                    println!("Vous avez les prérequis pour cet entraînement.");
+                    println!("Voulez-vous vous entraîner? (o/n)");
                     
+                    // Construire la chaîne de résultat
+                    let mut result = format!("Vous interagissez avec {} :\n", self.pnj.nom);
+                    result.push_str(&format!("\"{}\"\n", self.pnj.description));
+                    result.push_str(&format!("{} peut vous entraîner en {} et améliorer votre puissance de {} !\n", 
+                                    self.pnj.nom, competence, bonus_puissance));
+                    result.push_str("Vous avez les prérequis pour cet entraînement.\n");
+                    
+                    // Demander l'entrée utilisateur après avoir affiché tous les messages
                     let mut reponse = String::new();
                     io::stdin().read_line(&mut reponse).expect("Erreur de lecture");
                     let reponse = reponse.trim().to_lowercase();
@@ -430,19 +441,36 @@ impl PnjAvecType {
                                 joueur_vec.puissance = joueur_mut.puissance;
                             }
                             
-                            result.push_str(&format!("\nVotre puissance augmente de {}! Nouvelle puissance: {}", 
-                                            bonus_puissance, joueur_mut.puissance));
+                            println!("Votre puissance augmente de {}! Nouvelle puissance: {}", 
+                                     bonus_puissance, joueur_mut.puissance);
+                            result.push_str(&format!("Votre puissance augmente de {}! Nouvelle puissance: {}", 
+                                          bonus_puissance, joueur_mut.puissance));
                         }
                     } else {
-                        result.push_str("\nVous avez refusé l'entraînement.");
+                        println!("Vous avez refusé l'entraînement.");
+                        result.push_str("Vous avez refusé l'entraînement.");
                     }
+                    
+                    return result;
                 } else {
-                    result.push_str(&format!("\nVous n'êtes pas assez fort pour cet entraînement. Niveau requis: {} HP", niveau_requis));
+                    println!("Vous n'êtes pas assez fort pour cet entraînement.");
+                    println!("Niveau requis: {} HP - Votre niveau actuel: {} HP", niveau_requis, joueur.hp);
+                    
+                    let result = format!("Vous interagissez avec {} :\n", self.pnj.nom);
+                    result + &format!("\"{}\"\n", self.pnj.description) 
+                         + &format!("{} peut vous entraîner en {} et améliorer votre puissance de {} !\n", 
+                                   self.pnj.nom, competence, bonus_puissance)
+                         + &format!("Vous n'êtes pas assez fort pour cet entraînement.\n")
+                         + &format!("Niveau requis: {} HP - Votre niveau actuel: {} HP", niveau_requis, joueur.hp)
                 }
+            } else {
+                println!("Erreur: Joueur non trouvé!");
+                format!("Erreur: Joueur non trouvé!")
             }
+        } else {
+            println!("Erreur: Ce PNJ n'est pas un entraîneur!");
+            format!("Erreur: Ce PNJ n'est pas un entraîneur!")
         }
-        
-        result
     }
 }
 
@@ -572,9 +600,27 @@ fn show_objects_at_player_position(objets: &[Objet], lieux: &[Lieu], joueur: &Jo
                 println!("  • PNJ: {}", p.nom);
                 found = true;
             }
+            Objet::PnjAvecType(p) if &p.pnj.position == pos && &p.pnj.sous_position == sous_pos => {
+                // Afficher le PNJ avec son type spécifique
+                let type_description = match &p.type_de_pnj {
+                    PnjType::Gentil { .. } => "amical",
+                    PnjType::Ennemi { .. } => "hostile",
+                    PnjType::Entraineur { .. } => "entraîneur",
+                };
+                println!("  • PNJ {}: {} - \"{}\"", type_description, p.pnj.nom, p.pnj.description);
+                found = true;
+            }
+            Objet::FruitDuDemon(f) if &f.position == pos && &f.sous_position == sous_pos => {
+                println!("  • Fruit du Démon: {} ({})", f.nom, f.pouvoir);
+                found = true;
+            }
+            Objet::Aliment(a) if &a.position == pos && &a.sous_position == sous_pos => {
+                println!("  • Aliment: {} (+{} HP)", a.nom, a.hp);
+                found = true;
+            }
             _ => {}
-        }
     }
+}
     if !found {
         println!("  Rien d'autre ici.");
     }
@@ -1209,6 +1255,7 @@ fn afficher_stats(joueur: &Joueur, objets: &[Objet]) {
         None => println!("Fruit       : Aucun"),
     }
     println!("HP       : {}", joueur.hp);
+    println!("Puissance : {}", joueur.puissance);
 }
 
 fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {

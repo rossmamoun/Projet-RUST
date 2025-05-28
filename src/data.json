@@ -91,8 +91,8 @@
         "pnj": {
             "nom": "Rayleigh",
             "description": "Le Seigneur des Ténèbres, ancien bras droit du roi des pirates.",
-            "position": "piece2",
-            "sous_position": "Bar",
+            "position": "piece1",
+            "sous_position": "SEALABASTA",
             "inventaire": []
         },
         "type_de_pnj": {

@@ -1,0 +1,87 @@
+ [
+      {
+        "type": "lieu",
+        "id": "piece1",
+        "nom":"Alabasta",
+        "description":"Un royaume désertique.",
+        "required_key": "",
+        "connections": [
+            {
+                "orientation": "E",
+                "destination": "piece2"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece3"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece2",
+        "nom":"Marine Ford",
+        "description":"QG de la Marine.",
+        "required_key": "clemarineford",
+        "connections": [
+            {
+                "orientation": "O",
+                "destination": "piece1"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece4"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece4",
+        "nom":"Dressroza",
+        "description":"Île des jouets.",
+        "required_key": "map",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "piece2"
+            },
+            {
+                "orientation": "O",
+                "destination": "piece3"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece3",
+        "nom":"Water 7",
+        "description":"Ville des charpentiers.",
+        "required_key": "boussole",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "piece1"
+            },
+            {
+                "orientation": "E",
+                "destination": "piece4"
+            },
+            {
+                "orientation": "N",
+                "destination": "piece4"
+            }
+        ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece5",
+        "nom":"Wano",
+        "description":"Île isolée du monde.",
+        "required_key": "poissonkoi",
+        "connections": [
+            {
+                "orientation": "S",
+                "destination": "piece4"
+            }
+        ]
+    }
+]

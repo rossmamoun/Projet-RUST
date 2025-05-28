@@ -19,40 +19,40 @@
         "is_key": false
     },
     {
-        "type": "ObjetStatique",
+        "type": "aliment",
         "id": "objet2",
         "nom": "Viande",
         "description": "La viande préférée de Luffy, redonne beaucoup d'énergie.",
         "position": "piece1",
-        "sous_position":"SEALABASTA",
-        "is_key": false
+        "sous_position": "SEALABASTA",
+        "hp": 30
     },
     {
-        "type": "ObjetStatique",
+        "type": "aliment",
         "id": "objet3",
         "nom": "Pomme",
         "description": "La pomme redonne un peu d'énergie.",
         "position": "piece2",
-        "sous_position":"null",
-        "is_key": false
+        "sous_position": "MARINEQUARTIER",
+        "hp": 15
     },
     {
-        "type": "ObjetStatique",
+        "type": "aliment",
         "id": "objet4",
         "nom": "Poisson grillé",
         "description": "Un poisson pêché et grillé par Luffy.",
         "position": "piece3",
-        "sous_position":"null",
-        "is_key": false
+        "sous_position": "GALLEYTOM",
+        "hp": 25
     },
     {
-        "type": "ObjetStatique",
+        "type": "aliment",
         "id": "objet5",
         "nom": "Boule de riz",
         "description": "Un onigiri préparé par Sanji.",
         "position": "piece4",
-        "sous_position":"null",
-        "is_key": false
+        "sous_position": "COLISEE",
+        "hp": 20
     },
 
     {

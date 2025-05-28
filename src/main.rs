@@ -63,10 +63,21 @@ struct Joueur {
     nom: String,
     fruit_de_demon: Option<FruitDuDemon>,
     position: String,
-    sous_position:String,
-    inventaire: Vec<ObjetStatique>,
+    sous_position: String,
+    inventaire: Vec<ObjetInventaire>,  // On utilise ObjetInventaire au lieu de ObjetStatique
     puissance: u32,
     hp: u32
+}
+
+
+#[derive(Debug, Deserialize, Clone)]
+#[serde(tag = "type_inventaire")]
+enum ObjetInventaire {
+    #[serde(rename = "objet")]
+    ObjetStatique(ObjetStatique),
+    
+    #[serde(rename = "aliment")]
+    Aliment(Aliment)
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -135,25 +146,57 @@ enum Objet {
 }
 
 fn show_objects_at_player_position(objets: &[Objet]) {
-    // Trouver la sous-position du joueur
+    // Trouver la position et sous-position du joueur
+    let mut player_position = None;
     let mut player_sous_position = None;
 
     for obj in objets {
         if let Objet::Joueur(joueur) = obj {
+            player_position = Some(&joueur.position);
             player_sous_position = Some(&joueur.sous_position);
             break;
         }
     }
 
-    let player_sous_position = match player_sous_position {
-        Some(pos) => pos,
-        None => {
+    let (player_position, player_sous_position) = match (player_position, player_sous_position) {
+        (Some(pos), Some(sous_pos)) => (pos, sous_pos),
+        _ => {
             println!("Aucun joueur trouvé!");
             return;
         }
     };
 
-    println!("Dans le sous-lieu '{}' vous trouvez :", player_sous_position);
+    // Trouver le nom du lieu et du sous-lieu pour un affichage plus agréable
+    let lieu_nom = objets.iter()
+        .find_map(|obj| {
+            if let Objet::Lieu(l) = obj {
+                if &l.id == player_position {
+                    Some(&l.nom)
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .unwrap_or(player_position);
+
+    let sous_lieu_nom = objets.iter()
+        .find_map(|obj| {
+            if let Objet::SousLieu(sl) = obj {
+                if &sl.id == player_sous_position {
+                    Some(&sl.nom)
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .unwrap_or(player_sous_position);
+
+    println!("Vous êtes à : {} - {}", lieu_nom, sous_lieu_nom);
+    println!("À la position {} vous trouvez:", sous_lieu_nom);
 
     let mut found_something = false;
 
@@ -171,6 +214,10 @@ fn show_objects_at_player_position(objets: &[Objet]) {
                 println!("  • PNJ: {}", p.nom);
                 found_something = true;
             },
+            Objet::Aliment(a) if a.sous_position == *player_sous_position => {
+                println!("  • Aliment: {} (+{} HP)", a.nom, a.hp);
+                found_something = true;
+            },
             _ => {}
         }
     }
@@ -183,19 +230,21 @@ fn show_objects_at_player_position(objets: &[Objet]) {
 fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) {
     // Trouver position du joueur et son index
     let mut player_position = None;
+    let mut player_sous_position = None;
     let mut player_index = None;
     
     for (i, obj) in objets.iter().enumerate() {
         if let Objet::Joueur(joueur) = obj {
             player_position = Some(joueur.position.clone());
+            player_sous_position = Some(joueur.sous_position.clone());
             player_index = Some(i);
             break;
         }
     }
     
-    let player_position = match player_position {
-        Some(pos) => pos,
-        None => {
+    let (player_position, player_sous_position) = match (player_position, player_sous_position) {
+        (Some(pos), Some(sous_pos)) => (pos, sous_pos),
+        _ => {
             println!("Aucun joueur trouvé!");
             return;
         }
@@ -212,7 +261,10 @@ fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) 
     // Chercher le PNJ et son index
     for (i, obj) in objets.iter().enumerate() {
         if let Objet::Pnj(p) = obj {
-            if p.nom.to_lowercase() == pnj_name.to_lowercase() && p.position == player_position {
+            if p.nom.to_lowercase() == pnj_name.to_lowercase() && 
+               p.position == player_position && 
+               p.sous_position == player_sous_position {
+                
                 if p.is_enemy {
                     // Logique de combat existante
                     println!("🔥 COMBAT! Vous affrontez {} !", p.nom);
@@ -223,7 +275,14 @@ fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) 
                         let mut has_all_items = true;
                         
                         for item_id in &p.required_items {
-                            if !joueur.inventaire.iter().any(|i| &i.id == item_id) {
+                            let item_found = joueur.inventaire.iter().any(|inv_item| {
+                                match inv_item {
+                                    ObjetInventaire::ObjetStatique(obj) => &obj.id == item_id,
+                                    ObjetInventaire::Aliment(alim) => &alim.id == item_id,
+                                }
+                            });
+                            
+                            if !item_found {
                                 has_all_items = false;
                                 break;
                             }
@@ -279,8 +338,16 @@ fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) 
                                             let mut objet_final = objet.clone();
                                             objet_final.position = "inventaire".to_string();
                                             
-                                            println!("→ Objet '{}' ajouté à votre inventaire !", objet_final.nom);
-                                            joueur.inventaire.push(objet_final);
+                                            // Convertir en ObjetInventaire::ObjetStatique
+                                            let inv_obj = ObjetInventaire::ObjetStatique(objet_final);
+                                            
+                                            println!("→ Objet '{}' ajouté à votre inventaire !", objet.nom);
+                                            joueur.inventaire.push(inv_obj);
+                                            
+                                            // Synchronisation avec joueurs
+                                            if let Some(joueur_local) = joueurs.get_mut(0) {
+                                                joueur_local.inventaire = joueur.inventaire.clone();
+                                            }
                                         }
                                     }
                                 } else {
@@ -294,18 +361,10 @@ fn interact(objets: &mut Vec<Objet>, pnj_name: &str, joueurs: &mut Vec<Joueur>) 
                         }
                     }
                 }
-                    for obj in objets {
-                        if let Objet::Joueur(j) = obj {
-                            if let Some(joueur) = joueurs.get_mut(0) {
-                                joueur.inventaire = j.inventaire.clone();
-            }
-        }
-    }
                 return;
             }
         }
     }
-
     
     println!("Vous ne voyez pas {} ici.", pnj_name);
 }
@@ -355,12 +414,23 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
         }
     };
 
-    // Trouver tous les objets statiques au sous-lieu du joueur
+    // Trouver tous les objets statiques ET les aliments au sous-lieu du joueur
     objets.retain(|obj| {
         match obj {
             Objet::ObjetStatique(o) if o.sous_position == player_sous_position => {
                 println!("→ Objet '{}' capturé dans le sous-lieu !", o.nom);
-                objets_a_ajouter.push(o.clone());
+                
+                // Convertir en ObjetInventaire::ObjetStatique
+                let inv_obj = ObjetInventaire::ObjetStatique(o.clone());
+                objets_a_ajouter.push(inv_obj);
+                false // retirer de la liste globale
+            },
+            Objet::Aliment(a) if a.sous_position == player_sous_position => {
+                println!("→ Aliment '{}' (+{} HP) capturé dans le sous-lieu !", a.nom, a.hp);
+                
+                // Convertir en ObjetInventaire::Aliment
+                let inv_obj = ObjetInventaire::Aliment(a.clone());
+                objets_a_ajouter.push(inv_obj);
                 false // retirer de la liste globale
             },
             _ => true,
@@ -388,35 +458,30 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
             println!("🛑 Vous avez déjà tous vos HP (100). Impossible de consommer un aliment !");
             return;
         }
-        // Liste des aliments reconnus
-        let aliments = ["pomme", "viande", "poisson", "boule de riz"];
-        if let Some((index, aliment)) = joueur.inventaire.iter().enumerate().find(|(_, obj)| {
-            let nom = obj.nom.to_lowercase();
-            aliments.iter().any(|a| nom.contains(a))
+        
+        // Chercher un aliment dans l'inventaire (uniquement Aliment)
+        if let Some((index, item)) = joueur.inventaire.iter().enumerate().find(|(_, inv_obj)| {
+            matches!(inv_obj, ObjetInventaire::Aliment(_))
         }) {
-            let gain_hp = if aliment.nom.to_lowercase().contains("pomme") {
-                15
-            } else if aliment.nom.to_lowercase().contains("viande") {
-                30
-            } else if aliment.nom.to_lowercase().contains("poisson") {
-                25
-            } else if aliment.nom.to_lowercase().contains("boule de riz") {
-                20
-            } else {
-                10
-            };
-            let hp_avant = joueur.hp;
-            joueur.hp = (joueur.hp + gain_hp).min(100);
-            let hp_gagne = joueur.hp - hp_avant;
-            println!("🍽️ Vous consommez : {}", aliment.nom);
-            println!("❤️  Vous regagnez {} HP ! HP actuel : {}", hp_gagne, joueur.hp);
-            joueur.inventaire.remove(index);
+            // Obtenir le nom et les HP directement depuis l'aliment
+            if let ObjetInventaire::Aliment(aliment) = &item {
+                let nom = &aliment.nom;
+                let gain_hp = aliment.hp;
+                
+                let hp_avant = joueur.hp;
+                joueur.hp = (joueur.hp + gain_hp).min(100);
+                let hp_gagne = joueur.hp - hp_avant;
+                
+                println!("🍽️ Vous consommez : {}", nom);
+                println!("❤️  Vous regagnez {} HP ! HP actuel : {}", hp_gagne, joueur.hp);
+                joueur.inventaire.remove(index);
 
-            // Synchronisation avec la liste globale d'objets
-            for obj in objets.iter_mut() {
-                if let Objet::Joueur(j) = obj {
-                    j.inventaire = joueur.inventaire.clone();
-                    j.hp = joueur.hp;
+                // Synchronisation avec la liste globale d'objets
+                for obj in objets.iter_mut() {
+                    if let Objet::Joueur(j) = obj {
+                        j.inventaire = joueur.inventaire.clone();
+                        j.hp = joueur.hp;
+                    }
                 }
             }
         } else {
@@ -574,8 +639,21 @@ fn main() {
             "4" => {
                 // Inventaire
                 if let Some(joueur) = joueurs.get(0) {
-                    let noms_inventaire: Vec<&String> = joueur.inventaire.iter().map(|o| &o.nom).collect();
-                    println!("Inventaire : {:?}", noms_inventaire);
+                    println!("Inventaire :");
+                    if joueur.inventaire.is_empty() {
+                        println!("  (vide)");
+                    } else {
+                        for item in &joueur.inventaire {
+                            match item {
+                                ObjetInventaire::Aliment(a) => {
+                                    println!("  • 🍖 Aliment: {} (+{} HP)", a.nom, a.hp);
+                                },
+                                ObjetInventaire::ObjetStatique(o) => {
+                                    println!("  • 📦 Objet: {}", o.nom);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             "5" => {

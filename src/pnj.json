@@ -40,6 +40,20 @@
     {
         "type": "PnjAvecType",
         "pnj": {
+            "nom": "Ace",
+            "description": "Frère de Luffy, commandant de la 2ème division des Pirates Barbe Blanche.",
+            "position": "piece2",
+            "sous_position": "NEMARINEFORD",
+            "inventaire": ["map"]
+        },
+        "type_de_pnj": {
+            "type": "Gentil",
+            "dialogue_special": "Je peux t'aider à naviguer, mais tu dois me prouver ta valeur."
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
             "nom": "Franky",
             "description": "Charpentier légendaire.",
             "position": "piece3",
@@ -95,13 +109,13 @@
             "nom": "Akainu",
             "description": "Amiral de la Marine.",
             "position": "piece2",
-            "sous_position": "NOWMARINEFORD",
+            "sous_position": "NOMARINEFORD",
             "inventaire": ["poneglyphe2"]
         },
         "type_de_pnj": {
             "type": "Ennemi",
             "puissance": 25,
-            "hp": 200,
+            "hp": 300,
             "attaques": ["attaqueakainu"],
             "required_items": []
         }
@@ -119,7 +133,7 @@
             "nom": "Rayleigh",
             "description": "Le Seigneur des Ténèbres, ancien bras droit du roi des pirates.",
             "position": "piece4",
-            "sous_position": "SODRESSROSA",
+            "sous_position": "SODRESSROZA",
             "inventaire": []
         },
         "type_de_pnj": {
@@ -135,7 +149,7 @@
             "nom": "Doflamingo",
             "description": "Capitaine des Pirates Donquixote.",
             "position": "piece4",
-            "sous_position": "NODRESSROSA",
+            "sous_position": "NODRESSROZA",
             "inventaire": ["poneglyphe3","poissonkoi"]
         },
         "type_de_pnj": {

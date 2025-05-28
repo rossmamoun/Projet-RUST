@@ -6,9 +6,20 @@
         "position": "piece1",
         "sous_position":"SEALABASTA",
         "inventaire": [],
-        "puissance": 100,
-        "hp": 20
+        "puissance": 10,
+        "hp": 100
     },
+    
+    {
+        "type": "ObjetStatique",
+        "id": "boniglife1",
+        "nom": "Bonbon de vie",
+        "description": "Restaure 50 points de vie.",
+        "position": "piece1",
+        "sous_position":"SEALABASTA",
+        "is_key": false
+    },
+    
     {
         "type": "ObjetStatique",
         "id": "objet2",
@@ -19,43 +30,6 @@
         "is_key": false
     },
     {
-        "type": "aliment",
-        "id": "objet2",
-        "nom": "Viande",
-        "description": "La viande préférée de Luffy, redonne beaucoup d'énergie.",
-        "position": "piece1",
-        "sous_position": "SEALABASTA",
-        "hp": 30
-    },
-    {
-        "type": "aliment",
-        "id": "objet3",
-        "nom": "Pomme",
-        "description": "La pomme redonne un peu d'énergie.",
-        "position": "piece1",
-        "sous_position": "SEALABASTA",
-        "hp": 15
-    },
-    {
-        "type": "aliment",
-        "id": "objet4",
-        "nom": "Poisson grillé",
-        "description": "Un poisson pêché et grillé par Luffy.",
-        "position": "piece3",
-        "sous_position": "GALLEYTOM",
-        "hp": 25
-    },
-    {
-        "type": "aliment",
-        "id": "objet5",
-        "nom": "Boule de riz",
-        "description": "Un onigiri préparé par Sanji.",
-        "position": "piece4",
-        "sous_position": "COLISEE",
-        "hp": 20
-    },
-
-    {
         "type":"ObjetMobile",
         "id":"objet1",
         "nom":"Bateau",
@@ -65,29 +39,60 @@
         "is_key": false
     },
     {
-        "type": "Pnj",
-        "nom": "Vivi",
-        "description": "Princesse d'Alabasta.",
-        "position": "piece1",
-        "is_enemy": false,
-        "sous_position": "SEALABASTA",
-        "inventaire": ["objet2"],
-        "hp": 0,
-        "puissance": 0,
-        "attaques": []
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Vivi",
+            "description": "Princesse d'Alabasta.",
+            "position": "piece1",
+            "sous_position": "SEALABASTA",
+            "inventaire": ["objet2"]
+        },
+        "type_de_pnj": {
+            "type": "Gentil",
+            "dialogue_special": "Je suis heureuse de vous rencontrer, capitaine"
+        }
     },
     {
-        "type": "Pnj",
-        "nom": "Crocodile",
-        "description": "Sashiburidana MUGIWARA.",
-        "position": "piece1",
-        "sous_position": "NOALABASTA",
-        "is_enemy": true,
-        "required_items": ["objet2"],
-        "inventaire": ["key1", "boniglife1"],
-        "hp": 100,
-        "puissance": 15,
-        "attaques": ["attaque2"]
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Crocodile",
+            "description": "Sashiburidana MUGIWARA.",
+            "position": "piece1",
+            "sous_position": "NOALABASTA",
+            "inventaire": ["boniglife1", "key1"]
+        },
+        "type_de_pnj": {
+            "type": "Ennemi",
+            "puissance": 15,
+            "hp": 100,
+            "attaques": ["attaque2"],
+            "required_items": ["objet2"]
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Rayleigh",
+            "description": "Le Seigneur des Ténèbres, ancien bras droit du roi des pirates.",
+            "position": "piece2",
+            "sous_position": "Bar",
+            "inventaire": []
+        },
+        "type_de_pnj": {
+            "type": "Entraineur",
+            "competence": "Haki",
+            "bonus_puissance": 20,
+            "niveau_requis": 50
+        }
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "key1",
+        "nom": "Clé",
+        "description": "Permet de se deplacer",
+        "position": "null",
+        "sous_position":"null",
+        "is_key": true
     },
     {
         "type": "Attaque",
@@ -101,7 +106,7 @@
         "id": "attaque2",
         "nom": "Attaque de Crocodile",
         "description": "Attaque de base de Crocodile.",
-        "puissance": 70
+        "puissance": 10
     },
     {
         "type": "lieu",
@@ -159,7 +164,7 @@
         "id": "piece3",
         "nom":"Water 7",
         "description":"Ville des charpentiers.",
-        "required_key": "??????",
+        "required_key": "key1",
         "connections": [
             {
                 "orientation": "S",
@@ -188,31 +193,11 @@
             }
         ]
     },
-    {
-    "type": "FruitDuDemon",
-    "id": "gomu",
-    "nom": "Gomu Gomu no Mi",
-    "description": "Permet de transformer le corps en caoutchouc.",
-    "pouvoir": "Caoutchouc",
-    "position": "piece1",
-    "sous_position": "NEALABASTA",
-    "attaque": ["attaque1"]
-    },
-    {
-        "type": "FruitDuDemon",
-        "id": "yami",
-        "nom": "Yami Yami no Mi",
-        "description": "Permet de contrôler les ténèbres.",
-        "pouvoir": "Ténèbres",
-        "position": "piece1",
-        "sous_position": "NOALABASTA",
-        "attaque": ["attaque1"]
-    },
-    {
+        {
         "type": "souslieu",
         "id": "SEALABASTA",
-        "nom": "Nanohana",
-        "description": "Port principal d'Alabasta où Luffy a rencontré Ace.",
+        "nom": "Sud-Est",
+        "description": "Quartier est du royaume d'Alabasta.",
         "position": "piece1",
         "connections": [
             {
@@ -226,11 +211,14 @@
         ]
     },
 
-    {
+
+
+
+        {
         "type": "souslieu",
         "id": "SOALABASTA",
-        "nom": "Yuba",
-        "description": "Oasis asséchée où vit le père de Vivi, Toto.",
+        "nom": "Sud-Ouest",
+        "description": "Quartier est du royaume d'Alabasta.",
         "position": "piece1",
         "connections": [
             {
@@ -246,8 +234,8 @@
     {
         "type": "souslieu",
         "id": "NEALABASTA",
-        "nom": "Alubarna",
-        "description": "Capitale royale d'Alabasta, où se trouve le palais de Nefertari Cobra.",
+        "nom": "Nord-Est",
+        "description": "Zone désertique à l'est de la capitale.",
         "position": "piece1",
         "connections": [
             {
@@ -263,8 +251,8 @@
     {
         "type": "souslieu",
         "id": "NOALABASTA",
-        "nom": "Rain Base",
-        "description": "Ville casino abritant le repaire secret de Crocodile, le Rain Dinners.",
+        "nom": "Nord-Ouest",
+        "description": "Forteresse cachée de Baroque Works.",
         "position": "piece1",
         "connections": [
             {
@@ -278,276 +266,30 @@
         ]
     },
     {
-        "type": "souslieu",
-        "id": "MARINEQUARTIER",
-        "nom": "Quartier des Marines",
-        "description": "Zone où se rassemblent les marines ordinaires.",
-        "position": "piece2",
-        "connections": [
-            {
-                "orientation": "N",
-                "destination": "BUREAUSENGOKU"
-            },
-            {
-                "orientation": "E",
-                "destination": "BAIEEXECUTION"
-            }
-        ]
+    "type": "FruitDuDemon",
+    "id": "gomu",
+    "nom": "Gomu Gomu no Mi",
+    "description": "Permet de transformer le corps en caoutchouc.",
+    "pouvoir": "Caoutchouc",
+    "position": "piece1",
+    "sous_position": "SEALABASTA",
+    "attaque": ["attaque1", "attaque3"]
     },
     {
-        "type": "souslieu",
-        "id": "BUREAUSENGOKU",
-        "nom": "Bureau de Sengoku",
-        "description": "Le quartier général où l'Amiral en chef dirige les opérations.",
-        "position": "piece2",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "MARINEQUARTIER"
-            },
-            {
-                "orientation": "E",
-                "destination": "PORTMARINFORD"
-            }
-        ]
+        "type": "Attaque",
+        "id": "attaque3",
+        "nom": "Gomu Gomu no Bazooka",
+        "description": "Attaque puissante de Luffy.",
+        "puissance": 5
     },
     {
-        "type": "souslieu",
-        "id": "BAIEEXECUTION",
-        "nom": "Baie d'exécution",
-        "description": "La plateforme où Ace devait être exécuté.",
-        "position": "piece2",
-        "connections": [
-            {
-                "orientation": "O",
-                "destination": "MARINEQUARTIER"
-            },
-            {
-                "orientation": "N",
-                "destination": "PORTMARINFORD"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "PORTMARINFORD",
-        "nom": "Port de Marine Ford",
-        "description": "Le port où sont amarrés les navires de la Marine.",
-        "position": "piece2",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "BAIEEXECUTION"
-            },
-            {
-                "orientation": "O",
-                "destination": "BUREAUSENGOKU"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "GALLEYTOM",
-        "nom": "Galley-La Company",
-        "description": "Le chantier naval dirigé par Iceburg.",
-        "position": "piece3",
-        "connections": [
-            {
-                "orientation": "N",
-                "destination": "BLUSTATION"
-            },
-            {
-                "orientation": "E",
-                "destination": "CANALW7"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "BLUSTATION",
-        "nom": "Blue Station",
-        "description": "La gare où arrive le train des mers, Puffing Tom.",
-        "position": "piece3",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "GALLEYTOM"
-            },
-            {
-                "orientation": "E",
-                "destination": "FRANKYSHOUSE"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "CANALW7",
-        "nom": "Canaux principaux",
-        "description": "Les voies d'eau qui servent de rues à Water 7.",
-        "position": "piece3",
-        "connections": [
-            {
-                "orientation": "O",
-                "destination": "GALLEYTOM"
-            },
-            {
-                "orientation": "N",
-                "destination": "FRANKYSHOUSE"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "FRANKYSHOUSE",
-        "nom": "Repaire de Franky",
-        "description": "Le quartier général de la Franky Family.",
-        "position": "piece3",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "CANALW7"
-            },
-            {
-                "orientation": "O",
-                "destination": "BLUSTATION"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "COLISEE",
-        "nom": "Colisée Corrida",
-        "description": "L'arène où se déroule le tournoi pour le Mera Mera no Mi.",
-        "position": "piece4",
-        "connections": [
-            {
-                "orientation": "N",
-                "destination": "PALAISROYAL"
-            },
-            {
-                "orientation": "E",
-                "destination": "QUARTIERFLEURS"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "PALAISROYAL",
-        "nom": "Palais Royal",
-        "description": "Le château où réside Doflamingo.",
-        "position": "piece4",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "COLISEE"
-            },
-            {
-                "orientation": "E",
-                "destination": "PORTDRESSROZA"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "QUARTIERFLEURS",
-        "nom": "Quartier des Fleurs",
-        "description": "Le quartier résidentiel plein de jouets animés.",
-        "position": "piece4",
-        "connections": [
-            {
-                "orientation": "O",
-                "destination": "COLISEE"
-            },
-            {
-                "orientation": "N",
-                "destination": "PORTDRESSROZA"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "PORTDRESSROZA",
-        "nom": "Port de Dressroza",
-        "description": "Le port principal de l'île.",
-        "position": "piece4",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "QUARTIERFLEURS"
-            },
-            {
-                "orientation": "O",
-                "destination": "PALAISROYAL"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "KURI",
-        "nom": "Région de Kuri",
-        "description": "Ancienne région dirigée par Kozuki Oden.",
-        "position": "piece5",
-        "connections": [
-            {
-                "orientation": "N",
-                "destination": "CAPITALE"
-            },
-            {
-                "orientation": "E",
-                "destination": "UDON"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "CAPITALE",
-        "nom": "Capitale des Fleurs",
-        "description": "Le centre administratif de Wano où réside Orochi.",
-        "position": "piece5",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "KURI"
-            },
-            {
-                "orientation": "E",
-                "destination": "ONIGASHIMA"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "UDON",
-        "nom": "Région d'Udon",
-        "description": "Zone des mines et des prisons où travaillent les prisonniers.",
-        "position": "piece5",
-        "connections": [
-            {
-                "orientation": "O",
-                "destination": "KURI"
-            },
-            {
-                "orientation": "N",
-                "destination": "ONIGASHIMA"
-            }
-        ]
-    },
-    {
-        "type": "souslieu",
-        "id": "ONIGASHIMA",
-        "nom": "Île d'Onigashima",
-        "description": "Le repaire de Kaido et des Cent Bêtes.",
-        "position": "piece5",
-        "connections": [
-            {
-                "orientation": "S",
-                "destination": "UDON"
-            },
-            {
-                "orientation": "O",
-                "destination": "CAPITALE"
-            }
-        ]
+        "type": "FruitDuDemon",
+        "id": "yami",
+        "nom": "Yami Yami no Mi",
+        "description": "Permet de contrôler les ténèbres.",
+        "pouvoir": "Ténèbres",
+        "position": "piece1",
+        "sous_position": "NOALABASTA",
+        "attaque": ["attaque1"]
     }
-
 ]

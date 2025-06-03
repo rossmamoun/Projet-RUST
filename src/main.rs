@@ -47,7 +47,6 @@ struct Attaque {
 
 #[derive(Debug, Deserialize, Clone)]
 struct FruitDuDemon {
-    id: String,
     nom: String,
     description: String,
     sous_position:String,
@@ -119,63 +118,16 @@ struct PnjAvecType {
 }
 
 // Traits pour les comportements spécifiques
-trait Interactif {
-    fn interagir(&self, joueur: &mut Joueur) -> String;
-}
-
 trait Combattant {
-    fn attaquer(&self, joueur: &mut Joueur) -> (u32, String);
     fn est_vaincu(&self) -> bool;
 }
 
-trait Formateur {
-    fn entrainer(&self, joueur: &mut Joueur) -> bool;
-    fn competence(&self) -> &str;
-}
+
 
 // Implémentations des traits
-impl Interactif for PnjAvecType {
-    fn interagir(&self, joueur: &mut Joueur) -> String {
-        match &self.type_de_pnj {
-            PnjType::Ennemi { .. } => {
-                format!("{} vous regarde avec hostilité!", self.pnj.nom)
-            },
-            PnjType::Gentil { dialogue_special } => {
-                if let Some(dialogue) = dialogue_special {
-                    format!("{} dit: \"{}\"", self.pnj.nom, dialogue)
-                } else {
-                    format!("{} vous salue amicalement.", self.pnj.nom)
-                }
-            },
-            PnjType::Entraineur { competence, .. } => {
-                format!("{} propose de vous entraîner en {}.", self.pnj.nom, competence)
-            }
-        }
-    }
-}
+
 
 impl Combattant for PnjAvecType {
-    fn attaquer(&self, joueur: &mut Joueur) -> (u32, String) {
-        match &self.type_de_pnj {
-            PnjType::Ennemi { puissance, hp, attaques, .. } => {
-                if *hp == 0 {
-                    return (0, format!("{} est vaincu et ne peut pas attaquer.", self.pnj.nom));
-                }
-                
-                // Attaque avec la première attaque ou attaque de base
-                let degats = *puissance;
-                let message = if !attaques.is_empty() {
-                    format!("{} utilise {} et inflige {} dégâts!", 
-                            self.pnj.nom, attaques[0], degats)
-                } else {
-                    format!("{} attaque et inflige {} dégâts!", self.pnj.nom, degats)
-                };
-                
-                (degats, message)
-            },
-            _ => (0, format!("{} ne peut pas attaquer!", self.pnj.nom))
-        }
-    }
     
     fn est_vaincu(&self) -> bool {
         match &self.type_de_pnj {
@@ -185,48 +137,8 @@ impl Combattant for PnjAvecType {
     }
 }
 
-impl Formateur for PnjAvecType {
-    fn entrainer(&self, joueur: &mut Joueur) -> bool {
-        match &self.type_de_pnj {
-            PnjType::Entraineur { bonus_puissance, niveau_requis, .. } => {
-                if joueur.hp >= *niveau_requis {
-                    joueur.puissance += *bonus_puissance;
-                    true
-                } else {
-                    false
-                }
-            },
-            _ => false
-        }
-    }
-    
-    fn competence(&self) -> &str {
-        match &self.type_de_pnj {
-            PnjType::Entraineur { competence, .. } => competence,
-            _ => ""
-        }
-    }
-}
-
 // Méthodes utilitaires
 impl PnjAvecType {
-    fn est_ennemi(&self) -> bool {
-        matches!(self.type_de_pnj, PnjType::Ennemi { .. })
-    }
-    
-    fn est_entraineur(&self) -> bool {
-        matches!(self.type_de_pnj, PnjType::Entraineur { .. })
-    }
-    
-    fn est_gentil(&self) -> bool {
-        matches!(self.type_de_pnj, PnjType::Gentil { .. })
-    }
-    
-    fn set_hp(&mut self, new_hp: u32) {
-        if let PnjType::Ennemi { ref mut hp, .. } = self.type_de_pnj {
-            *hp = new_hp;
-        }
-    }
 
     // Méthode principale d'interaction qui va router vers la fonction spécifique
     fn interact_with_player(&mut self, objets: &mut Vec<Objet>, player_index: usize, joueurs: &mut Vec<Joueur>) -> String {
@@ -741,7 +653,6 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
         // Le PNJ contre-attaque
         let degats_pnj;
         let nom_attaque: &String;
-        let attaque_normale = String::from("attaque normale");
 
         if !attaques_pnj.is_empty() {
             // Utiliser la première attaque du PNJ
@@ -756,7 +667,6 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
         } else {
             // Si le PNJ n'a pas d'attaques, il utilise une attaque normale
             degats_pnj = pnj_puissance;
-            nom_attaque = &attaque_normale;
             
             println!("{} utilise une attaque normale et inflige {} points de dégâts!", 
                     pnj_avec_type.pnj.nom, degats_pnj);
@@ -1248,7 +1158,7 @@ fn capture_fruit_de_demon(objets: &mut Vec<Objet>, joueur: &mut Joueur) {
         }
         None
     }) {
-        println!("Un fruit du démon ({}) est trouvé dans ta zone !", fruit.nom);
+        println!("Un fruit du démon ({}, {}) est trouvé dans ta zone !", fruit.nom, fruit.description);
         match &joueur.fruit_de_demon {
             None => {
                 println!("Vous n'avez pas de fruit du démon. Voulez-vous le manger ? (o/n)");
@@ -1399,8 +1309,8 @@ fn effet_ivresse(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
     ];
     
     use rand::Rng;
-    let mut rng = rand::thread_rng();
-    let dialogue = dialogues[rng.gen_range(0..dialogues.len())];
+    let mut rng = rand::rng();
+    let dialogue = dialogues[rng.random_range(0..dialogues.len())];
     println!("\nVous criez soudainement: \"{}\"", dialogue);
     sleep(Duration::from_millis(2000));
     
@@ -1737,18 +1647,24 @@ fn main() {
                 consommer_aliment(&mut joueurs, &mut objets);
             }
             "10" => {
-                // Déplacement
+                // Déplacement interne
                 if let Some(joueur) = joueurs.get_mut(0) {
                     println!("Dans quelle direction ? (N/S/E/O)");
                     let mut dir = String::new();
                     io::stdin().read_line(&mut dir).unwrap();
                     let dir = dir.trim();
-                    move_inside(joueur, dir, &objets);
-                    // Mettre à jour la position du joueur dans objets
-                    for obj in &mut objets {
-                        if let Objet::Joueur(j) = obj {
-                            j.sous_position = joueur.sous_position.clone();
-                        }
+                    
+                    // Gérer le Result retourné par move_inside
+                    match move_inside(joueur, dir, &objets) {
+                        Ok(_) => {
+                            // Mettre à jour la position du joueur dans objets
+                            for obj in &mut objets {
+                                if let Objet::Joueur(j) = obj {
+                                    j.sous_position = joueur.sous_position.clone();
+                                }
+                            }
+                        },
+                        Err(message) => println!("{}", message),
                     }
                 }
             }

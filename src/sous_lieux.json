@@ -218,5 +218,13 @@
       { "orientation": "N", "destination": "NOWANO" },
       { "orientation": "E", "destination": "SEWANO" }
     ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SELAUGHTALE",
+    "nom": "Sud-Est de Laughtale",
+    "description": "Plage tranquille au sud-est.",
+    "position": "piece6",
+    "connections": []
   }
 ]

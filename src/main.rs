@@ -823,6 +823,38 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
             if let Objet::Joueur(j) = joueur_obj {
                 if let Some(joueur) = joueurs.get_mut(0) {
                     joueur.inventaire = j.inventaire.clone();
+
+                    // Vérifier si le joueur possède tous les Poneglyphes
+                    let a_poneglyphe1 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe1")
+                    });
+                    
+                    let a_poneglyphe2 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe2")
+                    });
+                    
+                    let a_poneglyphe3 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe3")
+                    });
+                    
+                    let a_poneglyphe4 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe4")
+                    });
+
+                    if a_poneglyphe1 && a_poneglyphe2 && a_poneglyphe3 && a_poneglyphe4 {
+                        // Téléporter directement à piece6 SELAUGHTALE
+                        println!("Vous avez collecté les 4 Poneglyphes! Un portail mystérieux s'ouvre...");
+                        joueur.position = "piece6".to_string();
+                        joueur.sous_position = "SELAUGHTALE".to_string();
+                        
+                        // Mettre à jour la position du joueur dans objets
+                        if let Some(Objet::Joueur(j)) = objets.get_mut(player_index) {
+                            j.position = "piece6".to_string();
+                            j.sous_position = "SELAUGHTALE".to_string();
+                        }
+                        
+                        println!("Vous êtes téléporté dans un lieu mystérieux!");
+                    }
                 }
             }
         }
@@ -1172,6 +1204,36 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
             if let Some(joueur) = joueurs.get_mut(0) {
                 joueur.inventaire = j.inventaire.clone();
             }
+        }
+    }
+    // Vérifier si le joueur a obtenu le One Piece
+    if let Some(joueur) = joueurs.get(0) {
+        let a_onepiece = joueur.inventaire.iter().any(|item| {
+            matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "onepiece")
+        });
+
+        if a_onepiece {
+            println!("\n\n🎉🎉🎉 FÉLICITATIONS! 🎉🎉🎉");
+            println!("Vous avez découvert le ONE PIECE, le trésor légendaire laissé par Gold Roger!");
+            println!("Vous êtes maintenant le ROI DES PIRATES!");
+            println!("\nFIN DU JEU");
+            
+            // ASCII Art et pause comme précédemment
+            println!("\n");
+            println!("     ____    ,____     ____           ____     O  ____     ____     ____ ");
+            println!("   /'    )--/'    )  /'    )        /'    )--/' /'    )  /'    )--/'    )");
+            println!(" /'    /' /'    /' /(___,/'       /'    /' /' /(___,/' /'       /(___,/' ");
+            println!("(___,/' /'    /(__(________     /(___,/'  (__(________(___,/   (________ ");
+            println!("                              /'                                         ");
+            println!("                            /'                                           ");
+            println!("                          /'                                             ");
+            println!("\n");
+            
+            use std::thread::sleep;
+            use std::time::Duration;
+            sleep(Duration::from_millis(5000));
+            
+            std::process::exit(0);
         }
     }
 }

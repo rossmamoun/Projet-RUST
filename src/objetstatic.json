@@ -79,5 +79,14 @@
         "position": "null",
         "sous_position":"null"
 
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "onepiece",
+        "nom": "One Piece",
+        "description": "Le trésor légendaire que tout le monde recherche.",
+        "position": "piece6",
+        "sous_position":"SELAUGHTALE"
+
     }
 ]

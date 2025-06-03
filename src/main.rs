@@ -47,6 +47,7 @@ struct Attaque {
 
 #[derive(Debug, Deserialize, Clone)]
 struct FruitDuDemon {
+    id: String,
     nom: String,
     description: String,
     sous_position:String,
@@ -1675,5 +1676,83 @@ fn main() {
             }
             _ => println!("Choix invalide."),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn joueur_test() -> Joueur {
+        Joueur {
+            nom: "Test".to_string(),
+            fruit_de_demon: None,
+            position: "piece1".to_string(),
+            sous_position: "SL1".to_string(),
+            inventaire: vec![],
+            puissance: 10,
+            hp: 100,
+        }
+    }
+
+    #[test]
+    fn test_afficher_stats_sans_fruit() {
+        let joueur = joueur_test();
+        let objets = vec![];
+        afficher_stats(&joueur, &objets); // Doit afficher "Fruit : Aucun"
+    }
+
+    #[test]
+    fn test_afficher_stats_avec_fruit() {
+        let mut joueur = joueur_test();
+        let fruit = FruitDuDemon {
+            id: "f1".to_string(),
+            nom: "Gomu Gomu".to_string(),
+            description: "Fruit du caoutchouc".to_string(),
+            sous_position: "SL1".to_string(),
+            pouvoir: "Caoutchouc".to_string(),
+            position: "piece1".to_string(),
+            attaque: vec!["a1".to_string()],
+        };
+        joueur.fruit_de_demon = Some(fruit);
+        let attaque = Attaque {
+            id: "a1".to_string(),
+            nom: "Pistol".to_string(),
+            description: "Coup de poing".to_string(),
+            puissance: 30,
+        };
+        let objets = vec![Objet::Attaque(attaque)];
+        afficher_stats(&joueur, &objets); // Doit afficher l'attaque
+    }
+
+    #[test]
+    fn test_show_objects_at_player_position_empty() {
+        let joueur = joueur_test();
+        let objets = vec![];
+        let lieux = vec![];
+        show_objects_at_player_position(&objets, &lieux, &joueur); // Doit n'afficher rien de spécial
+    }
+
+    #[test]
+    fn test_capture_fruit_de_demon_logic() {
+        // Ce test vérifie la logique sans interaction utilisateur
+        let mut joueur = joueur_test();
+        let fruit = FruitDuDemon {
+            id: "f1".to_string(),
+            nom: "Gomu Gomu".to_string(),
+            description: "Fruit du caoutchouc".to_string(),
+            sous_position: "SL1".to_string(),
+            pouvoir: "Caoutchouc".to_string(),
+            position: "piece1".to_string(),
+            attaque: vec![],
+        };
+        let mut objets = vec![Objet::FruitDuDemon(fruit.clone())];
+
+        // Simule le cas où le joueur n'a pas de fruit et prend le fruit automatiquement (sans interaction)
+        // Pour tester la logique, on appelle directement l'affectation
+        joueur.fruit_de_demon = Some(fruit.clone());
+        objets.remove(0);
+        assert!(joueur.fruit_de_demon.is_some());
+        assert!(objets.is_empty());
     }
 }

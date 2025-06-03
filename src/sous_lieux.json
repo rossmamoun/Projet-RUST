@@ -1,0 +1,230 @@
+[
+  {
+    "type": "souslieu",
+    "id": "NEALABASTA",
+    "nom": "Nord-Est d'Alabasta",
+    "description": "Zone Nord-Est du royaume d'Alabasta.",
+    "position": "piece1",
+    "connections": [
+      { "orientation": "S", "destination": "SEALABASTA" },
+      { "orientation": "O", "destination": "NOALABASTA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NOALABASTA",
+    "nom": "Nord-Ouest d'Alabasta",
+    "description": "Zone Nord-Ouest du royaume d'Alabasta.",
+    "position": "piece1",
+    "connections": [
+      { "orientation": "S", "destination": "SOALABASTA" },
+      { "orientation": "E", "destination": "NEALABASTA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SEALABASTA",
+    "nom": "Sud-Est d'Alabasta",
+    "description": "Zone Sud-Est du royaume d'Alabasta.",
+    "position": "piece1",
+    "connections": [
+      { "orientation": "N", "destination": "NEALABASTA" },
+      { "orientation": "O", "destination": "SOALABASTA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SOALABASTA",
+    "nom": "Sud-Ouest d'Alabasta",
+    "description": "Zone Sud-Ouest du royaume d'Alabasta.",
+    "position": "piece1",
+    "connections": [
+      { "orientation": "N", "destination": "NOALABASTA" },
+      { "orientation": "E", "destination": "SEALABASTA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NEMARINEFORD",
+    "nom": "Nord-Est de Marine Ford",
+    "description": "Quartier stratégique au nord-est.",
+    "position": "piece2",
+    "connections": [
+      { "orientation": "S", "destination": "SEMARINEFORD" },
+      { "orientation": "O", "destination": "NOMARINEFORD" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NOMARINEFORD",
+    "nom": "Nord-Ouest de Marine Ford",
+    "description": "Zone de surveillance nord-ouest.",
+    "position": "piece2",
+    "connections": [
+      { "orientation": "S", "destination": "SOMARINEFORD" },
+      { "orientation": "E", "destination": "NEMARINEFORD" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SEMARINEFORD",
+    "nom": "Sud-Est de Marine Ford",
+    "description": "Quartier administratif sud-est.",
+    "position": "piece2",
+    "connections": [
+      { "orientation": "N", "destination": "NEMARINEFORD" },
+      { "orientation": "O", "destination": "SOMARINEFORD" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SOMARINEFORD",
+    "nom": "Sud-Ouest de Marine Ford",
+    "description": "Zone portuaire sud-ouest.",
+    "position": "piece2",
+    "connections": [
+      { "orientation": "N", "destination": "NOMARINEFORD" },
+      { "orientation": "E", "destination": "SEMARINEFORD" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NEWATER7",
+    "nom": "Nord-Est de Water 7",
+    "description": "Chantiers navals au nord-est.",
+    "position": "piece3",
+    "connections": [
+      { "orientation": "S", "destination": "SEWATER7" },
+      { "orientation": "O", "destination": "NOWATER7" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NOWATER7",
+    "nom": "Nord-Ouest de Water 7",
+    "description": "Zone résidentielle au nord-ouest.",
+    "position": "piece3",
+    "connections": [
+      { "orientation": "S", "destination": "SOWATER7" },
+      { "orientation": "E", "destination": "NEWATER7" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SEWATER7",
+    "nom": "Sud-Est de Water 7",
+    "description": "Place du marché au sud-est.",
+    "position": "piece3",
+    "connections": [
+      { "orientation": "N", "destination": "NEWATER7" },
+      { "orientation": "O", "destination": "SOWATER7" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SOWATER7",
+    "nom": "Sud-Ouest de Water 7",
+    "description": "Quartier des ingénieurs au sud-ouest.",
+    "position": "piece3",
+    "connections": [
+      { "orientation": "N", "destination": "NOWATER7" },
+      { "orientation": "E", "destination": "SEWATER7" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NEDRESSROZA",
+    "nom": "Nord-Est de Dressroza",
+    "description": "Colline fleurie au nord-est.",
+    "position": "piece4",
+    "connections": [
+      { "orientation": "S", "destination": "SEDRESSROZA" },
+      { "orientation": "O", "destination": "NODRESSROZA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NODRESSROZA",
+    "nom": "Nord-Ouest de Dressroza",
+    "description": "Champs de tournesols au nord-ouest.",
+    "position": "piece4",
+    "connections": [
+      { "orientation": "S", "destination": "SODRESSROZA" },
+      { "orientation": "E", "destination": "NEDRESSROZA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SEDRESSROZA",
+    "nom": "Sud-Est de Dressroza",
+    "description": "Port des jouets au sud-est.",
+    "position": "piece4",
+    "connections": [
+      { "orientation": "N", "destination": "NEDRESSROZA" },
+      { "orientation": "O", "destination": "SODRESSROZA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SODRESSROZA",
+    "nom": "Sud-Ouest de Dressroza",
+    "description": "Place centrale au sud-ouest.",
+    "position": "piece4",
+    "connections": [
+      { "orientation": "N", "destination": "NODRESSROZA" },
+      { "orientation": "E", "destination": "SEDRESSROZA" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NEWANO",
+    "nom": "Nord-Est de Wano",
+    "description": "Temple ancien au nord-est.",
+    "position": "piece5",
+    "connections": [
+      { "orientation": "S", "destination": "SEWANO" },
+      { "orientation": "O", "destination": "NOWANO" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "NOWANO",
+    "nom": "Nord-Ouest de Wano",
+    "description": "Montagne de feu au nord-ouest.",
+    "position": "piece5",
+    "connections": [
+      { "orientation": "S", "destination": "SOWANO" },
+      { "orientation": "E", "destination": "NEWANO" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SEWANO",
+    "nom": "Sud-Est de Wano",
+    "description": "Quartier artisanal au sud-est.",
+    "position": "piece5",
+    "connections": [
+      { "orientation": "N", "destination": "NEWANO" },
+      { "orientation": "O", "destination": "SOWANO" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SOWANO",
+    "nom": "Sud-Ouest de Wano",
+    "description": "Forêt enchantée au sud-ouest.",
+    "position": "piece5",
+    "connections": [
+      { "orientation": "N", "destination": "NOWANO" },
+      { "orientation": "E", "destination": "SEWANO" }
+    ]
+  },
+  {
+    "type": "souslieu",
+    "id": "SELAUGHTALE",
+    "nom": "Sud-Est de Laughtale",
+    "description": "Plage tranquille au sud-est.",
+    "position": "piece6",
+    "connections": []
+  }
+]

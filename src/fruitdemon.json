@@ -13,14 +13,14 @@
     "id": "yami1",
     "nom": "Ténèbres Englobantes",
     "description": "Crée une zone de ténèbres qui immobilise l'ennemi.",
-    "puissance": 4
+    "puissance": 60
 }, 
 {
     "type": "Attaque",
     "id": "yami2",
     "nom": "Grappin des Ténèbres",
     "description": "Attrape l'ennemi avec des tentacules de ténèbres.",
-    "puissance": 3
+    "puissance": 40
 },
 {
     "type": "FruitDuDemon",
@@ -37,14 +37,14 @@
     "id": "ope1",
     "nom": "Chambre d'Opération",
     "description": "Crée une zone où l'utilisateur peut manipuler les objets.",
-    "puissance": 5
+    "puissance": 40
 }, 
 {
     "type": "Attaque",
     "id": "ope2",
     "nom": "Coup de Scalpel",
     "description": "Inflige une coupure précise à l'ennemi.",
-    "puissance": 4
+    "puissance": 55
 },
 {
     "type": "FruitDuDemon",
@@ -53,7 +53,7 @@
     "description": "Permet de contrôler le feu.",
     "pouvoir": "Feu",
     "position": "piece4",
-    "sous_position": "NEDRESSROSA",
+    "sous_position": "NEDRESSROZA",
     "attaque": ["mera1", "mera2"]
 }, 
 {
@@ -61,14 +61,14 @@
     "id": "mera1",
     "nom": "Boule de Feu",
     "description": "Lance une boule de feu sur l'ennemi.",
-    "puissance": 6
+    "puissance": 80
 }, 
 {
     "type": "Attaque",
     "id": "mera2",
     "nom": "Mur de Flammes",
     "description": "Crée un mur de flammes pour se protéger.",
-    "puissance": 5
+    "puissance": 70
 },
 {
     "type": "FruitDuDemon",
@@ -85,13 +85,37 @@
     "id": "ryu1",
     "nom": "Souffle de Dragon",
     "description": "Lance un souffle de feu puissant.",
-    "puissance": 7
+    "puissance": 90
 }, 
 {
     "type": "Attaque",
     "id": "ryu2",
     "nom": "Griffes du Dragon",
     "description": "Inflige des dégâts avec les griffes du dragon.",
-    "puissance": 6
+    "puissance": 100
+},
+{
+    "type": "FruitDuDemon",
+    "id": "gomu",
+    "nom": "Gomu Gomu no Mi",   
+    "description": "Permet de transformer le corps en caoutchouc.",
+    "pouvoir": "Caoutchouc",
+    "position": "piece1",
+    "sous_position": "SEALABASTA",
+    "attaque": ["gomu1", "gomu2"]
+},
+{
+    "type": "Attaque",
+    "id": "gomu1",
+    "nom": "Gomu Gomu no Pistol",
+    "description": "Tire un coup de poing élastique.",
+    "puissance": 30
+}, 
+{
+    "type": "Attaque",
+    "id": "gomu2",
+    "nom": "Gomu Gomu no Bazooka",
+    "description": "Attaque puissante de Luffy.",
+    "puissance": 50
 }
 ]

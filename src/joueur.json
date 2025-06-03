@@ -1,0 +1,11 @@
+[{
+        "type": "Joueur",
+        "nom": "",
+        "fruit_de_demon": null,
+        "position": "piece1",
+        "sous_position":"SEALABASTA",
+        "inventaire": [],
+        "puissance": 10,
+        "hp": 100
+    }
+]

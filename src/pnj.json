@@ -1,0 +1,211 @@
+[
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Crocodile",
+            "description": "Sashiburidana MUGIWARA.",
+            "position": "piece1",
+            "sous_position": "NOALABASTA",
+            "inventaire": ["poneglyphe1", "boussole"]
+        },
+        "type_de_pnj": {
+            "type": "Ennemi",
+            "puissance": 15,
+            "hp": 100,
+            "attaques": ["attaquecrocodile"],
+            "required_items": ["eau"]
+        }
+    },
+    {
+        "type": "Attaque",
+        "id": "attaquecrocodile",
+        "nom": "Attaque de Crocodile",
+        "description": "Attaque de base de Crocodile.",
+        "puissance": 10
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Vivi",
+            "description": "Princesse d'Alabasta.",
+            "position": "piece1",
+            "sous_position": "SEALABASTA",
+            "inventaire": ["eau"]
+        },
+        "type_de_pnj": {
+            "type": "Gentil",
+            "dialogue_special": "Je suis heureuse de vous rencontrer, capitaine"
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Ace",
+            "description": "Frère de Luffy, commandant de la 2ème division des Pirates Barbe Blanche.",
+            "position": "piece2",
+            "sous_position": "NEMARINEFORD",
+            "inventaire": ["map"]
+        },
+        "type_de_pnj": {
+            "type": "Gentil",
+            "dialogue_special": "Je peux t'aider à naviguer, mais tu dois me prouver ta valeur."
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Franky",
+            "description": "Charpentier légendaire.",
+            "position": "piece3",
+            "sous_position": "SEWATER7",
+            "inventaire": []
+        },
+        "type_de_pnj": {
+            "type": "Gentil",
+            "dialogue_special": "Tu devras trouver les 4 poneglyphes pour construire le navire ultime."
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Rob Lucci",
+            "description": "Agent du CP9.",
+            "position": "piece3",
+            "sous_position": "NOWATER7",
+            "inventaire": ["clemarineford"]
+        },
+        "type_de_pnj": {
+            "type": "Ennemi",
+            "puissance": 20,
+            "hp": 150,
+            "attaques": ["attaqueroblucci"],
+            "required_items": []
+        }
+    },
+    {
+        "type": "Attaque",
+        "id": "attaqueroblucci",
+        "nom": "Attaque de Rob Lucci",
+        "description": "Attaque de base de Rob Lucci.",
+        "puissance": 15
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Whitebeard",
+            "description": "Le plus grand pirate du monde.",
+            "position": "piece2",
+            "sous_position": "SEMARINEFORD",
+            "inventaire": ["epee"]
+        },
+        "type_de_pnj": {
+            "type": "Gentil",
+            "dialogue_special": "Je suis le plus grand pirate du monde, mais je ne suis pas ton ennemi. Tiens cette épée, elle te sera utile."
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Akainu",
+            "description": "Amiral de la Marine.",
+            "position": "piece2",
+            "sous_position": "NOMARINEFORD",
+            "inventaire": ["poneglyphe2"]
+        },
+        "type_de_pnj": {
+            "type": "Ennemi",
+            "puissance": 25,
+            "hp": 300,
+            "attaques": ["attaqueakainu"],
+            "required_items": []
+        }
+    },
+    {
+        "type": "Attaque",
+        "id": "attaqueakainu",
+        "nom": "Attaque d'Akainu",
+        "description": "Attaque de base d'Akainu.",
+        "puissance": 20
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Rayleigh",
+            "description": "Le Seigneur des Ténèbres, ancien bras droit du roi des pirates.",
+            "position": "piece4",
+            "sous_position": "SODRESSROZA",
+            "inventaire": []
+        },
+        "type_de_pnj": {
+            "type": "Entraineur",
+            "competence": "Haki",
+            "bonus_puissance": 20,
+            "niveau_requis": 50
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Doflamingo",
+            "description": "Capitaine des Pirates Donquixote.",
+            "position": "piece4",
+            "sous_position": "NODRESSROZA",
+            "inventaire": ["poneglyphe3","poissonkoi"]
+        },
+        "type_de_pnj": {
+            "type": "Ennemi",
+            "puissance": 30,
+            "hp": 250,
+            "attaques": ["attaquedoflamingo"],
+            "required_items": ["epee"]
+        }
+    },
+    {
+        "type": "Attaque",
+        "id": "attaquedoflamingo",
+        "nom": "Attaque de Doflamingo",
+        "description": "Attaque de base de Doflamingo.",
+        "puissance": 25
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Hyogoro",
+            "description": "Samouraï de Wano.",
+            "position": "piece5",
+            "sous_position": "SOWANO",
+            "inventaire": []
+        },
+        "type_de_pnj": {
+            "type": "Entraineur",
+            "dialogue_special": "Je peux t'apprendre à manier le haki, mais tu dois prouver ta valeur.",
+            "competence": "Haki",
+            "bonus_puissance": 30,
+            "niveau_requis": 70
+        }
+    },
+    {
+        "type": "PnjAvecType",
+        "pnj": {
+            "nom": "Kaido",
+            "description": "Empereur des mers, le plus puissant des Yonko.",
+            "position": "piece5",
+            "sous_position": "NOWANO",
+            "inventaire": ["poneglyphe4"]
+        },
+        "type_de_pnj": {
+            "type": "Ennemi",
+            "puissance": 50,
+            "hp": 500,
+            "attaques": ["attaquekaido"],
+            "required_items": []
+        }
+    },
+    {
+        "type": "Attaque",
+        "id": "attaquekaido",
+        "nom": "Attaque de Kaido",
+        "description": "Attaque de base de Kaido.",
+        "puissance": 40
+    }
+]

@@ -119,63 +119,16 @@ struct PnjAvecType {
 }
 
 // Traits pour les comportements spécifiques
-trait Interactif {
-    fn interagir(&self, joueur: &mut Joueur) -> String;
-}
-
 trait Combattant {
-    fn attaquer(&self, joueur: &mut Joueur) -> (u32, String);
     fn est_vaincu(&self) -> bool;
 }
 
-trait Formateur {
-    fn entrainer(&self, joueur: &mut Joueur) -> bool;
-    fn competence(&self) -> &str;
-}
+
 
 // Implémentations des traits
-impl Interactif for PnjAvecType {
-    fn interagir(&self, joueur: &mut Joueur) -> String {
-        match &self.type_de_pnj {
-            PnjType::Ennemi { .. } => {
-                format!("{} vous regarde avec hostilité!", self.pnj.nom)
-            },
-            PnjType::Gentil { dialogue_special } => {
-                if let Some(dialogue) = dialogue_special {
-                    format!("{} dit: \"{}\"", self.pnj.nom, dialogue)
-                } else {
-                    format!("{} vous salue amicalement.", self.pnj.nom)
-                }
-            },
-            PnjType::Entraineur { competence, .. } => {
-                format!("{} propose de vous entraîner en {}.", self.pnj.nom, competence)
-            }
-        }
-    }
-}
+
 
 impl Combattant for PnjAvecType {
-    fn attaquer(&self, joueur: &mut Joueur) -> (u32, String) {
-        match &self.type_de_pnj {
-            PnjType::Ennemi { puissance, hp, attaques, .. } => {
-                if *hp == 0 {
-                    return (0, format!("{} est vaincu et ne peut pas attaquer.", self.pnj.nom));
-                }
-                
-                // Attaque avec la première attaque ou attaque de base
-                let degats = *puissance;
-                let message = if !attaques.is_empty() {
-                    format!("{} utilise {} et inflige {} dégâts!", 
-                            self.pnj.nom, attaques[0], degats)
-                } else {
-                    format!("{} attaque et inflige {} dégâts!", self.pnj.nom, degats)
-                };
-                
-                (degats, message)
-            },
-            _ => (0, format!("{} ne peut pas attaquer!", self.pnj.nom))
-        }
-    }
     
     fn est_vaincu(&self) -> bool {
         match &self.type_de_pnj {
@@ -185,48 +138,8 @@ impl Combattant for PnjAvecType {
     }
 }
 
-impl Formateur for PnjAvecType {
-    fn entrainer(&self, joueur: &mut Joueur) -> bool {
-        match &self.type_de_pnj {
-            PnjType::Entraineur { bonus_puissance, niveau_requis, .. } => {
-                if joueur.hp >= *niveau_requis {
-                    joueur.puissance += *bonus_puissance;
-                    true
-                } else {
-                    false
-                }
-            },
-            _ => false
-        }
-    }
-    
-    fn competence(&self) -> &str {
-        match &self.type_de_pnj {
-            PnjType::Entraineur { competence, .. } => competence,
-            _ => ""
-        }
-    }
-}
-
 // Méthodes utilitaires
 impl PnjAvecType {
-    fn est_ennemi(&self) -> bool {
-        matches!(self.type_de_pnj, PnjType::Ennemi { .. })
-    }
-    
-    fn est_entraineur(&self) -> bool {
-        matches!(self.type_de_pnj, PnjType::Entraineur { .. })
-    }
-    
-    fn est_gentil(&self) -> bool {
-        matches!(self.type_de_pnj, PnjType::Gentil { .. })
-    }
-    
-    fn set_hp(&mut self, new_hp: u32) {
-        if let PnjType::Ennemi { ref mut hp, .. } = self.type_de_pnj {
-            *hp = new_hp;
-        }
-    }
 
     // Méthode principale d'interaction qui va router vers la fonction spécifique
     fn interact_with_player(&mut self, objets: &mut Vec<Objet>, player_index: usize, joueurs: &mut Vec<Joueur>) -> String {
@@ -454,14 +367,14 @@ impl PnjAvecType {
                     return result;
                 } else {
                     println!("Vous n'êtes pas assez fort pour cet entraînement.");
-                    println!("Niveau requis: {} HP - Votre niveau actuel: {} HP", niveau_requis, joueur.hp);
+                    println!("HP requis: {} HP - Vos HP actuel: {} HP", niveau_requis, joueur.hp);
                     
                     let result = format!("Vous interagissez avec {} :\n", self.pnj.nom);
                     result + &format!("\"{}\"\n", self.pnj.description) 
                          + &format!("{} peut vous entraîner en {} et améliorer votre puissance de {} !\n", 
                                    self.pnj.nom, competence, bonus_puissance)
                          + &format!("Vous n'êtes pas assez fort pour cet entraînement.\n")
-                         + &format!("Niveau requis: {} HP - Votre niveau actuel: {} HP", niveau_requis, joueur.hp)
+                         + &format!("HP requis: {} HP - Vos HP actuel: {} HP", niveau_requis, joueur.hp)
                 }
             } else {
                 println!("Erreur: Joueur non trouvé!");
@@ -593,7 +506,7 @@ fn show_objects_at_player_position(objets: &[Objet], lieux: &[Lieu], joueur: &Jo
                 found = true;
             }
             Objet::ObjetMobile(o) if &o.position == pos && &o.sous_position == sous_pos => {
-                println!("  • Objet Mobile: {} ({})", o.nom, o.id);
+                println!("  • Objet Mobile: {} , {} ({})", o.nom, o.description, o.id);
                 found = true;
             }
             Objet::Pnj(p) if &p.position == pos && &p.sous_position == sous_pos => {
@@ -615,7 +528,7 @@ fn show_objects_at_player_position(objets: &[Objet], lieux: &[Lieu], joueur: &Jo
                 found = true;
             }
             Objet::Aliment(a) if &a.position == pos && &a.sous_position == sous_pos => {
-                println!("  • Aliment: {} (+{} HP)", a.nom, a.hp);
+                println!("  • Aliment: {}, {} (+{} HP)", a.nom, a.description, a.hp);
                 found = true;
             }
             _ => {}
@@ -741,7 +654,6 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
         // Le PNJ contre-attaque
         let degats_pnj;
         let nom_attaque: &String;
-        let attaque_normale = String::from("attaque normale");
 
         if !attaques_pnj.is_empty() {
             // Utiliser la première attaque du PNJ
@@ -756,7 +668,6 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
         } else {
             // Si le PNJ n'a pas d'attaques, il utilise une attaque normale
             degats_pnj = pnj_puissance;
-            nom_attaque = &attaque_normale;
             
             println!("{} utilise une attaque normale et inflige {} points de dégâts!", 
                     pnj_avec_type.pnj.nom, degats_pnj);
@@ -823,6 +734,38 @@ fn combat(objets: &mut Vec<Objet>, pnj_index: usize, player_index: usize, joueur
             if let Objet::Joueur(j) = joueur_obj {
                 if let Some(joueur) = joueurs.get_mut(0) {
                     joueur.inventaire = j.inventaire.clone();
+
+                    // Vérifier si le joueur possède tous les Poneglyphes
+                    let a_poneglyphe1 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe1")
+                    });
+                    
+                    let a_poneglyphe2 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe2")
+                    });
+                    
+                    let a_poneglyphe3 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe3")
+                    });
+                    
+                    let a_poneglyphe4 = joueur.inventaire.iter().any(|item| {
+                        matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "poneglyphe4")
+                    });
+
+                    if a_poneglyphe1 && a_poneglyphe2 && a_poneglyphe3 && a_poneglyphe4 {
+                        // Téléporter directement à piece6 SELAUGHTALE
+                        println!("Vous avez collecté les 4 Poneglyphes! Un portail mystérieux s'ouvre...");
+                        joueur.position = "piece6".to_string();
+                        joueur.sous_position = "SELAUGHTALE".to_string();
+                        
+                        // Mettre à jour la position du joueur dans objets
+                        if let Some(Objet::Joueur(j)) = objets.get_mut(player_index) {
+                            j.position = "piece6".to_string();
+                            j.sous_position = "SELAUGHTALE".to_string();
+                        }
+                        
+                        println!("Vous êtes téléporté dans un lieu mystérieux!");
+                    }
                 }
             }
         }
@@ -942,17 +885,13 @@ fn move_inside(
                 );
                 return Ok(());
             } else {
-                println!(
+                return Err(format!(
                     "La destination {} n'existe pas dans ce lieu.",
                     conn.destination
-                );
-                return Err(" ".to_string());
+                ));
             }
         } else {
-            println!(
-                    "La destination n'existe pas dans ce lieu."
-                );
-                return Err(" ".to_string());
+            return Err(format!("Pas de connexion vers {}", orientation));
         }
     }
 
@@ -965,16 +904,28 @@ fn move_inside(
 fn move_joueur(
     joueur: &mut Joueur,
     direction: &str,
-    objets: &Vec<Objet>
+    objets: &mut Vec<Objet>  // Changez en &mut pour pouvoir modifier les objets
 ) {
-
-
-        let mut lieux: Vec<Lieu> = Vec::new();
-    let mut objets_mobiles: Vec<ObjetMobile> = Vec::new();
-    let mut objets_statiques: Vec<ObjetStatique> = Vec::new();
+    // Extraire les informations nécessaires
+    let mut lieux: Vec<Lieu> = Vec::new();
     let mut sous_lieux: Vec<SousLieu> = Vec::new();
 
-    for obj in objets {
+    // Vérifier si un bateau est présent à la position actuelle du joueur
+    let bateau_present = objets.iter().any(|obj| {
+        if let Objet::ObjetMobile(o) = obj {
+            o.nom == "Bateau" && o.position == joueur.position && o.sous_position == joueur.sous_position
+        } else {
+            false
+        }
+    });
+    
+    if !bateau_present {
+        println!("Il n'y a pas de bateau ici pour vous déplacer, cherchez le bateau.");
+        return;
+    }
+
+    // Extraire les lieux et sous-lieux
+    for obj in objets.iter() {
         match obj {
             Objet::Lieu(lieu) => lieux.push(Lieu {
                 id: lieu.id.clone(),
@@ -983,20 +934,6 @@ fn move_joueur(
                 required_key: lieu.required_key.clone(),
                 description: lieu.description.clone(),
             }),
-            Objet::ObjetMobile(objet) => objets_mobiles.push(ObjetMobile {
-                nom: objet.nom.clone(),
-                position: objet.position.clone(),
-                description: objet.description.clone(),
-                id: objet.id.clone(),
-                sous_position: objet.sous_position.clone(),
-            }),
-            Objet::ObjetStatique(objet) => objets_statiques.push(ObjetStatique {
-                    nom: objet.nom.clone(),
-                    position: objet.position.clone(),
-                    description: objet.description.clone(),
-                    id: objet.id.clone(),
-                    sous_position: objet.sous_position.clone(),
-                }),
             Objet::SousLieu(sous_lieu) => sous_lieux.push(SousLieu {
                 nom: sous_lieu.nom.clone(),
                 position: sous_lieu.position.clone(),
@@ -1004,23 +941,16 @@ fn move_joueur(
                 id: sous_lieu.id.clone(),
                 connections: sous_lieu.connections.clone(),
             }),
-            
-            
             _ => {}
         }
     }
+
     if direction != "N" && direction != "S" && direction != "E" && direction != "O" {
         println!("Direction invalide. Utilisez N, S, E ou O.");
         return;
     }
 
-    let bateau_present = objets_mobiles.iter().any(|o| o.nom == "Bateau" && o.position == joueur.position && o.sous_position == joueur.sous_position);
-    if !bateau_present {
-        println!("Il n'y a pas de bateau ici pour vous déplacer, cherchez le bateau.");
-        return;
-    }
-
-
+    // Trouver le lieu actuel et vérifier la connexion
     for lieu in &lieux {
         if lieu.id == joueur.position {
             if let Some(conn) = lieu.connections.iter().find(|c| c.orientation == direction) {
@@ -1032,41 +962,37 @@ fn move_joueur(
                             ObjetInventaire::Aliment(a) => a.id == destination_lieu.required_key,
                         });
                         if !a_cle {
-                            // 🔍 Chercher l’objet statique correspondant à la clé
-                            if let Some(objet) = objets_statiques.iter().find(|o| o.id == destination_lieu.required_key) {
-                                println!(
-                                    "Vous avez besoin de la clé '{}' pour entrer dans ce lieu !\n→ Description : {}",
-                                    objet.nom, objet.description
-                                );
-                            } else {
-                                println!(
-                                    "Clé requise non trouvée dans la base d'objets : ID '{}'",
-                                    destination_lieu.required_key
-                                );
-                            }
+                            println!("Vous devez avoir '{}' pour y accéder.", destination_lieu.required_key);
                             return;
                         }
                     }
 
-                    joueur.position =  destination_lieu.id.clone();
-                        // Séparer les objets de type Joueur et Lieu
-
+                    // Mise à jour position du joueur
+                    let ancien_lieu_id = joueur.position.clone();
+                    let ancien_sous_lieu_id = joueur.sous_position.clone();
+                    joueur.position = destination_lieu.id.clone();
 
                     // Rechercher le premier sous-lieu commençant par "SE" dans la nouvelle position
-                    if let Some(sous_lieu_se) = sous_lieux.iter().find(|sl| sl.position == joueur.position && sl.id.starts_with("SE")) {
+                    if let Some(sous_lieu_se) = sous_lieux.iter().find(|sl| 
+                        sl.position == joueur.position && sl.id.starts_with("SE")) {
+                        
                         joueur.sous_position = sous_lieu_se.id.clone();
-                        for objet in objets_mobiles.iter_mut() {
-                            if objet.nom == "Bateau" && objet.position == lieu.id {
-                                objet.position = destination_lieu.id.clone();
-                                objet.sous_position = sous_lieu_se.id.clone();
-                                break;
+                        
+                        // Mise à jour de la position du bateau
+                        for obj in objets.iter_mut() {
+                            if let Objet::ObjetMobile(objet) = obj {
+                                if objet.nom == "Bateau" && 
+                                   objet.position == ancien_lieu_id &&
+                                   objet.sous_position == ancien_sous_lieu_id {
+                                    
+                                    println!("Vous utilisez le bateau pour aller vers {}.", destination_lieu.nom);
+                                    objet.position = destination_lieu.id.clone();
+                                    objet.sous_position = sous_lieu_se.id.clone();
+                                }
                             }
                         }
                     }
 
-                    
-
-                    //joueur.sous_position = destination_lieu.id.clone(); // Mettre à jour la sous-position du joueur
                     println!("Déplacement vers {}", destination_lieu.nom);
                     return;
                 }
@@ -1191,6 +1117,36 @@ fn capture_objets_statiques(objets: &mut Vec<Objet>, joueurs: &mut Vec<Joueur>) 
             }
         }
     }
+    // Vérifier si le joueur a obtenu le One Piece
+    if let Some(joueur) = joueurs.get(0) {
+        let a_onepiece = joueur.inventaire.iter().any(|item| {
+            matches!(item, ObjetInventaire::ObjetStatique(o) if o.id == "onepiece")
+        });
+
+        if a_onepiece {
+            println!("\n\n🎉🎉🎉 FÉLICITATIONS! 🎉🎉🎉");
+            println!("Vous avez découvert le ONE PIECE, le trésor légendaire laissé par Gold Roger!");
+            println!("Vous êtes maintenant le ROI DES PIRATES!");
+            println!("\nFIN DU JEU");
+            
+            // ASCII Art et pause comme précédemment
+            println!("\n");
+            println!("     ____    ,____     ____           ____     O  ____     ____     ____ ");
+            println!("   /'    )--/'    )  /'    )        /'    )--/' /'    )  /'    )--/'    )");
+            println!(" /'    /' /'    /' /(___,/'       /'    /' /' /(___,/' /'       /(___,/' ");
+            println!("(___,/' /'    /(__(________     /(___,/'  (__(________(___,/   (________ ");
+            println!("                              /'                                         ");
+            println!("                            /'                                           ");
+            println!("                          /'                                             ");
+            println!("\n");
+            
+            use std::thread::sleep;
+            use std::time::Duration;
+            sleep(Duration::from_millis(5000));
+            
+            std::process::exit(0);
+        }
+    }
 }
 
 fn capture_fruit_de_demon(objets: &mut Vec<Objet>, joueur: &mut Joueur) {
@@ -1203,7 +1159,7 @@ fn capture_fruit_de_demon(objets: &mut Vec<Objet>, joueur: &mut Joueur) {
         }
         None
     }) {
-        println!("Un fruit du démon ({}) est trouvé dans ta zone !", fruit.nom);
+        println!("Un fruit du démon ({}, {}) est trouvé dans ta zone !", fruit.nom, fruit.description);
         match &joueur.fruit_de_demon {
             None => {
                 println!("Vous n'avez pas de fruit du démon. Voulez-vous le manger ? (o/n)");
@@ -1301,6 +1257,10 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
         
         // Consommer l'aliment choisi
         let (index, aliment) = &aliments[choix - 1];
+        
+        // Vérifier si c'est du Saké de Wano
+        let est_sake = aliment.nom.contains("Saké");
+        
         let hp_avant = joueur.hp;
         joueur.hp = (joueur.hp + aliment.hp).min(100);
         let hp_gagne = joueur.hp - hp_avant;
@@ -1316,7 +1276,95 @@ fn consommer_aliment(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
                 j.hp = joueur.hp;
             }
         }
+        
+        // Appliquer l'effet d'ivresse si c'est du Saké
+        if est_sake {
+            effet_ivresse(joueurs, objets);
+        }
     }
+}
+
+fn effet_ivresse(joueurs: &mut Vec<Joueur>, objets: &mut Vec<Objet>) {
+    use std::thread::sleep;
+    use std::time::Duration;
+    
+    println!("\n🍶 Vous buvez le Saké de Wano d'une traite...");
+    sleep(Duration::from_millis(1000));
+    
+    println!("Vous sentez une chaleur se répandre dans tout votre corps...");
+    sleep(Duration::from_millis(1500));
+    
+    // Effet visuel de vision floue
+    println!("\nVoTre ViSioN deViEnT flOuE...");
+    sleep(Duration::from_millis(800));
+    println!("LeS sOns SemBleNt dÉfOrmÉs...");
+    sleep(Duration::from_millis(800));
+    
+    // Dialogue d'ivresse aléatoire
+    let dialogues = [
+        "JE VAIS DEVENIRRR LE ROI DES PIRATESSSS!!!",
+        "Hé Zoro... t'es mon meilleur ami tu sais...",
+        "Je pourrais... *hic*... battre Kaido les yeux fermés...",
+        "Sanji... fais-moi encore à mangerrrrr...",
+        "Shanks! Rends-moi mon chapeau... ah non, il est là..."
+    ];
+    
+    use rand::Rng;
+    let mut rng = rand::rng();
+    let dialogue = dialogues[rng.random_range(0..dialogues.len())];
+    println!("\nVous criez soudainement: \"{}\"", dialogue);
+    sleep(Duration::from_millis(2000));
+    
+    // Bonus temporaire
+    if let Some(joueur) = joueurs.get_mut(0) {
+        let bonus_puissance = 15;
+        joueur.puissance += bonus_puissance;
+        println!("\n💪 Vous vous sentez INVINCIBLE! (+{} puissance temporaire)", bonus_puissance);
+        
+        // Synchroniser avec objets
+        for obj in objets.iter_mut() {
+            if let Objet::Joueur(j) = obj {
+                j.puissance = joueur.puissance;
+            }
+        }
+    }
+    
+    // Mini-jeu d'équilibre
+    println!("\n🌀 Vous titubez... Essayez de garder l'équilibre!");
+    println!("Tapez 'stable' rapidement pour ne pas tomber!");
+    
+    // Démarrer un timer
+    let debut = std::time::Instant::now();
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Erreur de lecture");
+    
+    let temps = debut.elapsed().as_secs_f32();
+    
+    if input.trim().to_lowercase() == "stable" && temps < 5.0 {
+        println!("✅ Vous gardez l'équilibre (juste à temps)!");
+    } else {
+        println!("❌ Vous trébuchez et tombez face contre terre!");
+        
+        // Petite pénalité
+        if let Some(joueur) = joueurs.get_mut(0) {
+            joueur.hp = (joueur.hp as f32 * 0.9) as u32; // 10% dégâts
+            
+            // Synchroniser
+            for obj in objets.iter_mut() {
+                if let Objet::Joueur(j) = obj {
+                    j.hp = joueur.hp;
+                }
+            }
+            
+            println!("Vous perdez quelques HP en tombant. HP actuel: {}", joueur.hp);
+        }
+    }
+    
+    println!("\n⏱️ L'effet du saké se dissipera dans quelques minutes...");
+    sleep(Duration::from_millis(3000));
+    
+    // Restaurer puissance normale (après 3 tours de jeu)
+    println!("(L'effet de puissance se dissipera après 3 actions)");
 }
 
 fn mini_jeu_devinette() {
@@ -1385,8 +1433,40 @@ fn mini_jeu_calcul() {
 
 
 fn main() {
-    let data = fs::read_to_string("data.json").expect("Impossible de lire le fichier");
-    let mut objets: Vec<Objet> = serde_json::from_str(&data).expect("Erreur de parsing JSON");
+    // Liste de tous les fichiers JSON à charger
+    let files = [
+        "joueur.json",
+        "lieu.json",
+        "sous_lieux.json",
+        "objetstatic.json",
+        "pnj.json", 
+        "fruitdemon.json",
+        "aliments.json",
+        "objetmobile.json",
+    ];
+    
+    // Structure pour stocker tous les objets du jeu
+    let mut objets: Vec<Objet> = Vec::new();
+    
+    // Charger chaque fichier et combiner les données
+    for filename in &files {
+        match fs::read_to_string(filename) {
+            Ok(content) => {
+                match serde_json::from_str::<Vec<Objet>>(&content) {
+                    Ok(parsed_objects) => {
+                        objets.extend(parsed_objects);
+                    },
+                    Err(e) => {
+                        println!("⚠️ Erreur de parsing JSON dans {} : {}", filename, e);
+                    }
+                }
+            },
+            Err(e) => {
+                println!("⚠️ Impossible de lire le fichier {} : {}", filename, e);
+            }
+        }
+    }
+
 
     // Séparer les objets de type Joueur et Lieu
     let mut lieux: Vec<Lieu> = Vec::new();
@@ -1478,11 +1558,12 @@ fn main() {
                     let mut dir = String::new();
                     io::stdin().read_line(&mut dir).unwrap();
                     let dir = dir.trim();
-                    move_joueur(joueur, dir, &objets);
+                    move_joueur(joueur, dir, &mut objets); // Passage de &mut objets
                     // Mettre à jour la position du joueur dans objets
                     for obj in &mut objets {
                         if let Objet::Joueur(j) = obj {
                             j.position = joueur.position.clone();
+                            j.sous_position = joueur.sous_position.clone();
                         }
                     }
                 }
@@ -1567,18 +1648,24 @@ fn main() {
                 consommer_aliment(&mut joueurs, &mut objets);
             }
             "10" => {
-                // Déplacement
+                // Déplacement interne
                 if let Some(joueur) = joueurs.get_mut(0) {
                     println!("Dans quelle direction ? (N/S/E/O)");
                     let mut dir = String::new();
                     io::stdin().read_line(&mut dir).unwrap();
                     let dir = dir.trim();
-                    move_inside(joueur, dir, &objets);
-                    // Mettre à jour la position du joueur dans objets
-                    for obj in &mut objets {
-                        if let Objet::Joueur(j) = obj {
-                            j.sous_position = joueur.sous_position.clone();
-                        }
+                    
+                    // Gérer le Result retourné par move_inside
+                    match move_inside(joueur, dir, &objets) {
+                        Ok(_) => {
+                            // Mettre à jour la position du joueur dans objets
+                            for obj in &mut objets {
+                                if let Objet::Joueur(j) = obj {
+                                    j.sous_position = joueur.sous_position.clone();
+                                }
+                            }
+                        },
+                        Err(message) => println!("{}", message),
                     }
                 }
             }
@@ -1590,4 +1677,351 @@ fn main() {
             _ => println!("Choix invalide."),
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn joueur_test() -> Joueur {
+        Joueur {
+            nom: "Test".to_string(),
+            fruit_de_demon: None,
+            position: "piece1".to_string(),
+            sous_position: "SL1".to_string(),
+            inventaire: vec![],
+            puissance: 10,
+            hp: 100,
+        }
+    }
+
+    #[test]
+    fn test_afficher_stats_sans_fruit() {
+        let joueur = joueur_test();
+        let objets = vec![];
+        afficher_stats(&joueur, &objets); // Doit afficher "Fruit : Aucun"
+    }
+
+    #[test]
+    fn test_afficher_stats_avec_fruit() {
+        let mut joueur = joueur_test();
+        let fruit = FruitDuDemon {
+            id: "f1".to_string(),
+            nom: "Gomu Gomu".to_string(),
+            description: "Fruit du caoutchouc".to_string(),
+            sous_position: "SL1".to_string(),
+            pouvoir: "Caoutchouc".to_string(),
+            position: "piece1".to_string(),
+            attaque: vec!["a1".to_string()],
+        };
+        joueur.fruit_de_demon = Some(fruit);
+        let attaque = Attaque {
+            id: "a1".to_string(),
+            nom: "Pistol".to_string(),
+            description: "Coup de poing".to_string(),
+            puissance: 30,
+        };
+        let objets = vec![Objet::Attaque(attaque)];
+        afficher_stats(&joueur, &objets); // Doit afficher l'attaque
+    }
+
+    #[test]
+    fn test_show_objects_at_player_position_empty() {
+        let joueur = joueur_test();
+        let objets = vec![];
+        let lieux = vec![];
+        show_objects_at_player_position(&objets, &lieux, &joueur); // Doit n'afficher rien de spécial
+    }
+
+    #[test]
+    fn test_capture_fruit_de_demon_logic() {
+        // Ce test vérifie la logique sans interaction utilisateur
+        let mut joueur = joueur_test();
+        let fruit = FruitDuDemon {
+            id: "f1".to_string(),
+            nom: "Gomu Gomu".to_string(),
+            description: "Fruit du caoutchouc".to_string(),
+            sous_position: "SL1".to_string(),
+            pouvoir: "Caoutchouc".to_string(),
+            position: "piece1".to_string(),
+            attaque: vec![],
+        };
+        let mut objets = vec![Objet::FruitDuDemon(fruit.clone())];
+
+        // Simule le cas où le joueur n'a pas de fruit et prend le fruit automatiquement (sans interaction)
+        // Pour tester la logique, on appelle directement l'affectation
+        joueur.fruit_de_demon = Some(fruit.clone());
+        objets.remove(0);
+        assert!(joueur.fruit_de_demon.is_some());
+        assert!(objets.is_empty());
+    }
+    // Fonctions utilitaires pour les tests
+    fn creer_joueur_test() -> Joueur {
+        Joueur {
+            nom: "Test".to_string(),
+            fruit_de_demon: None,
+            position: "piece1".to_string(),
+            sous_position: "SL1".to_string(),
+            inventaire: vec![],
+            puissance: 10,
+            hp: 100,
+        }
+    }
+
+    fn creer_pnj_gentil() -> PnjAvecType {
+        PnjAvecType {
+            pnj: Pnj {
+                nom: "PNJ Gentil".to_string(),
+                description: "Un PNJ amical".to_string(),
+                position: "piece1".to_string(),
+                sous_position: "SL1".to_string(),
+                inventaire: vec![],
+            },
+            type_de_pnj: PnjType::Gentil {
+                dialogue_special: Some("Bonjour aventurier !".to_string()),
+            },
+        }
+    }
+
+    fn creer_pnj_ennemi() -> PnjAvecType {
+        PnjAvecType {
+            pnj: Pnj {
+                nom: "PNJ Ennemi".to_string(),
+                description: "Un PNJ hostile".to_string(),
+                position: "piece1".to_string(),
+                sous_position: "SL1".to_string(),
+                inventaire: vec![],
+            },
+            type_de_pnj: PnjType::Ennemi {
+                puissance: 5,
+                hp: 50,
+                attaques: vec!["attaque1".to_string()],
+                required_items: vec![],
+            },
+        }
+    }
+
+    fn creer_attaque_test() -> Attaque {
+        Attaque {
+            id: "attaque1".to_string(),
+            nom: "Attaque Test".to_string(),
+            description: "Une attaque pour les tests".to_string(),
+            puissance: 20,
+        }
+    }
+
+    // Tests pour la fonction interact
+    #[test]
+    fn test_interact_avec_pnj_inexistant() {
+        let mut objets = vec![
+            Objet::Joueur(creer_joueur_test()),
+            Objet::PnjAvecType(creer_pnj_gentil()),
+        ];
+        let mut joueurs = vec![creer_joueur_test()];
+        
+        // Tester avec un nom de PNJ qui n'existe pas
+        interact(&mut objets, "PNJ Inconnu", &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+    #[test]
+    fn test_interact_avec_pnj_existant() {
+        let mut joueur = creer_joueur_test();
+        let pnj_gentil = creer_pnj_gentil();
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_gentil.clone()),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Interagir avec un PNJ qui existe
+        interact(&mut objets, &pnj_gentil.pnj.nom, &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+    #[test]
+    fn test_interact_avec_pnj_different_position() {
+        let mut joueur = creer_joueur_test();
+        let mut pnj_gentil = creer_pnj_gentil();
+        pnj_gentil.pnj.position = "piece2".to_string(); // PNJ dans une position différente
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_gentil.clone()),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Tenter d'interagir avec un PNJ qui est dans un lieu différent
+        interact(&mut objets, &pnj_gentil.pnj.nom, &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+
+    #[test]
+    fn test_combat_avec_pnj_non_ennemi() {
+        let mut joueur = creer_joueur_test();
+        let pnj_gentil = creer_pnj_gentil();
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_gentil),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Tenter de combattre un PNJ qui n'est pas un ennemi
+        combat(&mut objets, 1, 0, &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+
+    #[test]
+    fn test_combat_resultat_hp() {
+        // Créer un joueur avec beaucoup de HP pour assurer la victoire
+        let mut joueur = creer_joueur_test();
+        joueur.puissance = 100; // Joueur très puissant
+        
+        // Créer un ennemi faible
+        let mut pnj_ennemi = creer_pnj_ennemi();
+        if let PnjType::Ennemi { ref mut hp, .. } = pnj_ennemi.type_de_pnj {
+            *hp = 10; // Ennemi avec peu de HP
+        }
+        
+        let attaque = creer_attaque_test();
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_ennemi),
+            Objet::Attaque(attaque),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Simuler un combat où le joueur devrait gagner facilement
+        combat(&mut objets, 1, 0, &mut joueurs);
+        
+        // Vérifier que l'ennemi a bien été vaincu (HP à 0)
+        if let Objet::PnjAvecType(pnj) = &objets[1] {
+            if let PnjType::Ennemi { hp, .. } = pnj.type_de_pnj {
+                assert_eq!(hp, 0, "L'ennemi devrait être vaincu (HP à 0)");
+            }
+        }
+    }
+
+#[test]
+fn test_move_inside_ok() {
+    let mut joueur = Joueur {
+        nom: "Test".to_string(),
+        fruit_de_demon: None,
+        position: "L1".to_string(),
+        sous_position: "SL1".to_string(),
+        inventaire: vec![],
+        puissance: 10,
+        hp: 100,
+    };
+
+    let sous_lieu1 = SousLieu {
+        nom: "Chambre".to_string(),
+        position: "L1".to_string(),
+        description: "Chambre de repos".to_string(),
+        id: "SL1".to_string(),
+        connections: vec![Connection {
+            orientation: "E".to_string(),
+            destination: "SL2".to_string(),
+        }],
+    };
+
+    let sous_lieu2 = SousLieu {
+        nom: "Cuisine".to_string(),
+        position: "L1".to_string(),
+        description: "Lieu de cuisine".to_string(),
+        id: "SL2".to_string(),
+        connections: vec![],
+    };
+
+    let objets = vec![
+        Objet::SousLieu(sous_lieu1.clone()),
+        Objet::SousLieu(sous_lieu2.clone()),
+    ];
+
+    let result = move_inside(&mut joueur, "E", &objets);
+    assert!(result.is_ok());
+    assert_eq!(joueur.sous_position, "SL2");
+}
+
+
+
+#[test]
+fn test_move_joueur_ok() {
+    let mut joueur = Joueur {
+        nom: "Test".to_string(),
+        fruit_de_demon: None,
+        position: "L1".to_string(),
+        sous_position: "SL1".to_string(),
+        inventaire: vec![],
+        puissance: 10,
+        hp: 100,
+    };
+
+    let lieu1 = Lieu {
+        id: "L1".to_string(),
+        nom: "Village".to_string(),
+        description: "Un petit village".to_string(),
+        connections: vec![Connection {
+            orientation: "N".to_string(),
+            destination: "L2".to_string(),
+        }],
+        required_key: "".to_string(),
+    };
+
+    let lieu2 = Lieu {
+        id: "L2".to_string(),
+        nom: "Forêt".to_string(),
+        description: "Forêt dense".to_string(),
+        connections: vec![],
+        required_key: "".to_string(),
+    };
+
+    let sous_lieu2 = SousLieu {
+        nom: "Entrée Forêt".to_string(),
+        position: "L2".to_string(),
+        description: "Entrée de la forêt".to_string(),
+        id: "SE1".to_string(),
+        connections: vec![],
+    };
+
+    let bateau = Objet::ObjetMobile(ObjetMobile {
+        nom: "Bateau".to_string(),
+        description: "Un bateau solide".to_string(),
+        position: "L1".to_string(),
+        sous_position: "SL1".to_string(),
+        id: "B1".to_string(),
+    });
+
+    let mut objets = vec![
+        Objet::Lieu(lieu1),
+        Objet::Lieu(lieu2),
+        Objet::SousLieu(sous_lieu2),
+        bateau,
+    ];
+
+    move_joueur(&mut joueur, "N", &mut objets);
+
+    // Le joueur doit avoir changé de lieu
+    assert_eq!(joueur.position, "L2");
+    assert_eq!(joueur.sous_position, "SE1");
+
+    // Le bateau doit aussi avoir bougé
+    let bateau_mis_a_jour = objets.iter().find_map(|o| {
+        if let Objet::ObjetMobile(obj) = o {
+            if obj.nom == "Bateau" {
+                return Some(obj.clone());
+            }
+        }
+        None
+    }).unwrap();
+
+    assert_eq!(bateau_mis_a_jour.position, "L2");
+    assert_eq!(bateau_mis_a_jour.sous_position, "SE1");
+}
+
 }

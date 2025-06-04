@@ -1755,4 +1755,157 @@ mod tests {
         assert!(joueur.fruit_de_demon.is_some());
         assert!(objets.is_empty());
     }
+    // Fonctions utilitaires pour les tests
+    fn creer_joueur_test() -> Joueur {
+        Joueur {
+            nom: "Test".to_string(),
+            fruit_de_demon: None,
+            position: "piece1".to_string(),
+            sous_position: "SL1".to_string(),
+            inventaire: vec![],
+            puissance: 10,
+            hp: 100,
+        }
+    }
+
+    fn creer_pnj_gentil() -> PnjAvecType {
+        PnjAvecType {
+            pnj: Pnj {
+                nom: "PNJ Gentil".to_string(),
+                description: "Un PNJ amical".to_string(),
+                position: "piece1".to_string(),
+                sous_position: "SL1".to_string(),
+                inventaire: vec![],
+            },
+            type_de_pnj: PnjType::Gentil {
+                dialogue_special: Some("Bonjour aventurier !".to_string()),
+            },
+        }
+    }
+
+    fn creer_pnj_ennemi() -> PnjAvecType {
+        PnjAvecType {
+            pnj: Pnj {
+                nom: "PNJ Ennemi".to_string(),
+                description: "Un PNJ hostile".to_string(),
+                position: "piece1".to_string(),
+                sous_position: "SL1".to_string(),
+                inventaire: vec![],
+            },
+            type_de_pnj: PnjType::Ennemi {
+                puissance: 5,
+                hp: 50,
+                attaques: vec!["attaque1".to_string()],
+                required_items: vec![],
+            },
+        }
+    }
+
+    fn creer_attaque_test() -> Attaque {
+        Attaque {
+            id: "attaque1".to_string(),
+            nom: "Attaque Test".to_string(),
+            description: "Une attaque pour les tests".to_string(),
+            puissance: 20,
+        }
+    }
+
+    // Tests pour la fonction interact
+    #[test]
+    fn test_interact_avec_pnj_inexistant() {
+        let mut objets = vec![
+            Objet::Joueur(creer_joueur_test()),
+            Objet::PnjAvecType(creer_pnj_gentil()),
+        ];
+        let mut joueurs = vec![creer_joueur_test()];
+        
+        // Tester avec un nom de PNJ qui n'existe pas
+        interact(&mut objets, "PNJ Inconnu", &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+    #[test]
+    fn test_interact_avec_pnj_existant() {
+        let mut joueur = creer_joueur_test();
+        let pnj_gentil = creer_pnj_gentil();
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_gentil.clone()),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Interagir avec un PNJ qui existe
+        interact(&mut objets, &pnj_gentil.pnj.nom, &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+    #[test]
+    fn test_interact_avec_pnj_different_position() {
+        let mut joueur = creer_joueur_test();
+        let mut pnj_gentil = creer_pnj_gentil();
+        pnj_gentil.pnj.position = "piece2".to_string(); // PNJ dans une position différente
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_gentil.clone()),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Tenter d'interagir avec un PNJ qui est dans un lieu différent
+        interact(&mut objets, &pnj_gentil.pnj.nom, &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+
+    #[test]
+    fn test_combat_avec_pnj_non_ennemi() {
+        let mut joueur = creer_joueur_test();
+        let pnj_gentil = creer_pnj_gentil();
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_gentil),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Tenter de combattre un PNJ qui n'est pas un ennemi
+        combat(&mut objets, 1, 0, &mut joueurs);
+        // Le test passe si la fonction ne panique pas
+    }
+
+
+    #[test]
+    fn test_combat_resultat_hp() {
+        // Créer un joueur avec beaucoup de HP pour assurer la victoire
+        let mut joueur = creer_joueur_test();
+        joueur.puissance = 100; // Joueur très puissant
+        
+        // Créer un ennemi faible
+        let mut pnj_ennemi = creer_pnj_ennemi();
+        if let PnjType::Ennemi { ref mut hp, .. } = pnj_ennemi.type_de_pnj {
+            *hp = 10; // Ennemi avec peu de HP
+        }
+        
+        let attaque = creer_attaque_test();
+        
+        let mut objets = vec![
+            Objet::Joueur(joueur.clone()),
+            Objet::PnjAvecType(pnj_ennemi),
+            Objet::Attaque(attaque),
+        ];
+        let mut joueurs = vec![joueur];
+        
+        // Simuler un combat où le joueur devrait gagner facilement
+        combat(&mut objets, 1, 0, &mut joueurs);
+        
+        // Vérifier que l'ennemi a bien été vaincu (HP à 0)
+        if let Objet::PnjAvecType(pnj) = &objets[1] {
+            if let PnjType::Ennemi { hp, .. } = pnj.type_de_pnj {
+                assert_eq!(hp, 0, "L'ennemi devrait être vaincu (HP à 0)");
+            }
+        }
+    }
+
+    // Tests existants...
 }

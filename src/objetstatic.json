@@ -33,7 +33,7 @@
     },
     {
         "type": "ObjetStatique",
-        "id": "epe",
+        "id": "epee",
         "nom": "Épée de Whitebeard",
         "description": "Une épée légendaire appartenant à Whitebeard.",
         "position": "null",
@@ -78,6 +78,15 @@
         "description": "Une boussole spéciale qui pointe vers le prochain Poneglyphe.",
         "position": "null",
         "sous_position":"null"
+
+    },
+    {
+        "type": "ObjetStatique",
+        "id": "onepiece",
+        "nom": "One Piece",
+        "description": "Le trésor légendaire que tout le monde recherche.",
+        "position": "piece6",
+        "sous_position":"SELAUGHTALE"
 
     }
 ]

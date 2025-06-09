@@ -67,7 +67,7 @@
             },
             {
                 "orientation": "N",
-                "destination": "piece4"
+                "destination": "piece5"
             }
         ]
     },
@@ -83,5 +83,13 @@
                 "destination": "piece4"
             }
         ]
+    },
+    {
+        "type": "lieu",
+        "id": "piece6",
+        "nom":"Laugh Tale",
+        "description":"Île légendaire au bout du monde.",
+        "required_key": "",
+        "connections": []
     }
 ]

@@ -6,7 +6,7 @@
         "description": "Riz blanc, un aliment de base.",
         "position": "piece1",
         "sous_position": "SOALABASTA",
-        "hp": 20
+        "hp": 50
     },
     {
         "type": "Aliment",
@@ -15,7 +15,7 @@
         "description": "La pomme redonne un peu d'énergie.",
         "position": "piece2",
         "sous_position": "SOMARINEFORD",
-        "hp": 15
+        "hp": 55
     },
     {
         "type": "Aliment",
@@ -24,7 +24,7 @@
         "description": "La viande préférée de Luffy, redonne beaucoup d'énergie.",
         "position": "piece3",
         "sous_position": "SOWATER7",
-        "hp": 30
+        "hp": 100
     },
     {
         "type": "Aliment",
@@ -32,8 +32,8 @@
         "nom": "Paella",
         "description": "Spécialité de Dressrosa, savoureuse et énergisante.",
         "position": "piece4",
-        "sous_position": "SEDRESSROSA",
-        "hp": 25
+        "sous_position": "SEDRESSROZA",
+        "hp": 55
     },
     {
         "type": "Aliment", 
@@ -42,6 +42,6 @@
         "description": "Alcool traditionnel de Wano, revigorant.",
         "position": "piece1",
         "sous_position": "SOALABASTA",
-        "hp": 35
+        "hp": 65
     }
 ]
